@@ -1,0 +1,9 @@
+body{
+    background-color: rgb(44, 39, 32);
+    display: flex;
+    justify-content: center;
+}
+.canva{
+    margin-top: 150px;
+    border: 2px solid black;
+}
