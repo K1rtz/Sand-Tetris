@@ -7,8 +7,11 @@ export class Tetris{
         this.lastFrameTime = 0
         this.width = 300;
         this.height = 500;
-        this.grid = []
-        this.grid2 = []
+        this.w = 5;
+        this.rows
+        this.cols
+        this.grid
+        this.grid2
         this.cells = []
 
         this.ctx
@@ -24,45 +27,72 @@ export class Tetris{
 
     draw(){
 
-        this.cells.forEach(e=>e.show())
-        for(let i  = 0; i < this.height/5; i++){
-            for(let j = 0; j< this.width/5; j++){
-                //this.dropDownCheck(this.grid[i][j])
-                if(!this.grid[i][j] == 1){
-                    this.grid2[i][j] = 0;
-                    if(i>0){
-                        this.grid2[i-1][j] = 1;
+        //this.cells.forEach(e=>e.show())
+        for(let i = 0; i < this.cols; i++){
+            for(let j = 0; j < this.rows; j++){
+                if(this.grid[i][j] == 0)
+                    this.ctx.fillStyle = 'black'
+                else
+                    this.ctx.fillStyle = 'white'
+                this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
+                this.grid2[i][j] = 0;
+            }
+        }
+
+        // for(let i = 0; i < this.cols; i++){
+        //     for(let j = 0; j < this.rows; j++){
+        //         let state = this.grid[i][j]
+        //         if(state === 1){
+        //             console.log('x')
+        //             let below = this.grid[i][j+1]
+        //             if(below === 0){
+        //                 // this.grid2[i][j] = 0;
+        //                 this.grid2[i][j+1] = 1;
+                        
+        //             }
+        //         }
+        //     }
+        // }
+        for(let i = this.cols-1; i >= 0; i--){
+            for(let j = this.rows-1; j >= 0; j--){
+                let state = this.grid[i][j]
+                if(state === 1){
+                    console.log('x')
+                    let below = this.grid[i][j+1]
+                    if(below === 0){
+                        // this.grid2[i][j] = 0;
+                        this.grid[i][j] = 0;
+                        this.grid2[i][j+1] = 1;
+                        
                     }
                 }
             }
         }
-        this.swapGrids();
-
+        this.swapGrids()
 
         
     }
 
     swapGrids(){
-        [this.grid, this.grid2] = [this.grid2, this.grid]
+        // [this.grid, this.grid2] = [this.grid2, this.grid]
+        // prom = this.grid2;
+
+        this.grid = this.grid2.map(row => row.slice());
+        // console.log(this.grid[10])
+
     }
 
     createGrid(){
-        for(let i  = 0; i < this.height/5; i++){
-            this.grid[i] = []
-            this.grid2[i] = []
-            for(let j = 0; j< this.width/5; j++){
-                let c = new Cell(i, j, 5, this.ctx, this.grid);
-                this.cells.push(c);
-                this.grid[i][j] = 0;
-                this.grid2[i][j] = 0;
-            }
-        }
-
-        this.grid[50][50] = 1;
-        this.grid[0][0] = 1;
-        this.grid[99][0] = 1;
-        this.grid[99][59] = 1;
-        this.grid2[1][1] = false;
+        // for(let i  = 0; i < this.height/5; i++){
+        //     this.grid[i] = []
+        //     this.grid2[i] = []
+        //     for(let j = 0; j< this.width/5; j++){
+        //         let c = new Cell(i, j, 5, this.ctx, this.grid);
+        //         this.cells.push(c);
+        //         this.grid[i][j] = 0;
+        //         this.grid2[i][j] = 0;
+        //     }
+        // }
 
     }
 
@@ -73,6 +103,24 @@ export class Tetris{
         canvas.classList.add('canva')
         canvas.width = this.width;
         canvas.height = this.height;
+        this.cols = this.width/this.w;
+        this.rows = this.height/this.w;
+        this.grid = new Array(this.cols).fill(0).map(() => new Array(this.rows).fill(0));
+        this.grid2 = new Array(this.cols).fill(0).map(() => new Array(this.rows).fill(0));
+
+        for(let i = 0; i< this.cols; i++){
+            for(let j = 0; j <this.rows; j++){
+                this.grid[i][j] = 0;
+                this.grid2[i][j] = 0;
+            }
+        }
+
+
+        this.grid[10][20] = 1;
+        this.grid[10][21] = 1;
+        this.grid[10][22] = 1;
+        this.grid[11][21] = 1;
+
         this.host.appendChild(canvas);
         this.ctx = canvas.getContext('2d');
     }
