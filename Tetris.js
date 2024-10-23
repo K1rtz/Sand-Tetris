@@ -20,7 +20,6 @@ export class Tetris{
 
     start(){
         this.createCanvas()
-        this.createGrid()
         this.draw()
         this.animate()
     }  
@@ -39,20 +38,6 @@ export class Tetris{
             }
         }
 
-        // for(let i = 0; i < this.cols; i++){
-        //     for(let j = 0; j < this.rows; j++){
-        //         let state = this.grid[i][j]
-        //         if(state === 1){
-        //             console.log('x')
-        //             let below = this.grid[i][j+1]
-        //             if(below === 0){
-        //                 // this.grid2[i][j] = 0;
-        //                 this.grid2[i][j+1] = 1;
-                        
-        //             }
-        //         }
-        //     }
-        // }
         for(let i = this.cols-1; i >= 0; i--){
             for(let j = this.rows-1; j >= 0; j--){
                 let state = this.grid[i][j]
@@ -74,29 +59,10 @@ export class Tetris{
     }
 
     swapGrids(){
-        // [this.grid, this.grid2] = [this.grid2, this.grid]
-        // prom = this.grid2;
-
         this.grid = this.grid2.map(row => row.slice());
-        // console.log(this.grid[10])
+
 
     }
-
-    createGrid(){
-        // for(let i  = 0; i < this.height/5; i++){
-        //     this.grid[i] = []
-        //     this.grid2[i] = []
-        //     for(let j = 0; j< this.width/5; j++){
-        //         let c = new Cell(i, j, 5, this.ctx, this.grid);
-        //         this.cells.push(c);
-        //         this.grid[i][j] = 0;
-        //         this.grid2[i][j] = 0;
-        //     }
-        // }
-
-    }
-
-
 
     createCanvas(){
         const canvas = document.createElement('canvas');
