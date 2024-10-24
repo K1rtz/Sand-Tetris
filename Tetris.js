@@ -16,6 +16,8 @@ export class Tetris{
 
         this.ctx
 
+        this.frameDelay = 600;
+
     }
 
     start(){
@@ -44,15 +46,34 @@ export class Tetris{
                 if(state === 1){
                     console.log('x')
                     let below = this.grid[i][j+1]
-                    if(below === 0){
+                    if(below != undefined && below === 0){
                         // this.grid2[i][j] = 0;
                         this.grid[i][j] = 0;
                         this.grid2[i][j+1] = 1;
-                        
+                    }else if(below != undefined && below != 0){
+                        let dRight = this.grid[i+1][j+1]
+                        let dLeft = this.grid[i-1][j+1]
+                        if(dRight != undefined && dRight === 0){
+                            this.grid[i][j]  = 0
+                            this.grid[i+1][j+1]  = 1
+                            this.grid2[i+1][j+1]  = 1
+                        }
+                        else if(dLeft != undefined && dLeft === 0){
+                            this.grid[i][j]  = 0
+                            this.grid[i-1][j+1]  = 1
+                            this.grid2[i-1][j+1]  = 1
+                        }
+                        else{
+                            this.grid2[i][j] = 1;
+                        }
+                    }
+                    else{
+                        this.grid2[i][j] = 1;
                     }
                 }
             }
         }
+        console.log(this.grid[this.cols-1][this.rows])
         this.swapGrids()
 
         
@@ -82,18 +103,37 @@ export class Tetris{
         }
 
 
-        this.grid[10][20] = 1;
-        this.grid[10][21] = 1;
-        this.grid[10][22] = 1;
-        this.grid[11][21] = 1;
+        // this.grid[10][18] = 1;
+        // this.grid[10][17] = 1;
+        // this.grid[11][18] = 1;
+        // this.grid[11][17] = 1;
+        // this.grid[10][19] = 1;
+        // this.grid[11][19] = 1;
+        // this.grid[10][20] = 1;
+        // this.grid[11][20] = 1;
+        // this.grid[10][21] = 1;
+        // this.grid[10][22] = 1;
+        // this.grid[11][22] = 1;
+        // this.grid[12][22] = 1;
+        // this.grid[13][22] = 1;
+        // this.grid[11][21] = 1;
+        // this.grid[12][21] = 1;
+        // this.grid[14][22] = 1;
+        // this.grid[13][21] = 1;
+        // this.grid[14][21] = 1;
+        for(let i = 10; i<13; i++){
+            for(let j = 80; j<83;j++){
+                this.grid[i][j] = 1;
+            }
+        }
 
         this.host.appendChild(canvas);
         this.ctx = canvas.getContext('2d');
     }
     animate(){
-        const frameDelay = 200;
+        //const frameDelay = 200;
         const currentTime = performance.now()
-        if (currentTime - this.lastFrameTime >= frameDelay) {
+        if (currentTime - this.lastFrameTime >= this.frameDelay) {
             this.ctx.resetTransform()
             this.ctx.clearRect(0, 0, this.width, this.height)
             this.draw()
