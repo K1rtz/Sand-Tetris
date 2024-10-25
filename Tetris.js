@@ -16,7 +16,7 @@ export class Tetris{
 
         this.ctx
 
-        this.frameDelay = 600;
+        this.frameDelay = 200;
 
     }
 
@@ -40,15 +40,18 @@ export class Tetris{
             }
         }
 
-        for(let i = this.cols-1; i >= 0; i--){
-            for(let j = this.rows-1; j >= 0; j--){
+        for(let j = this.rows-1; j >= 0; j--){
+            for(let i = this.cols-1; i >= 0; i--){  
+                //this.grid2[this.cols-4][this.rows-1] = 1;
+
                 let state = this.grid[i][j]
                 if(state === 1){
                     console.log('x')
                     let below = this.grid[i][j+1]
                     if(below != undefined && below === 0){
-                        // this.grid2[i][j] = 0;
+
                         this.grid[i][j] = 0;
+                        this.grid[i][j+1] = 1;
                         this.grid2[i][j+1] = 1;
                     }else if(below != undefined && below != 0){
                         let dRight = this.grid[i+1][j+1]
@@ -73,7 +76,7 @@ export class Tetris{
                 }
             }
         }
-        console.log(this.grid[this.cols-1][this.rows])
+        //console.log(this.grid[this.cols-1][this.rows])
         this.swapGrids()
 
         
@@ -102,8 +105,21 @@ export class Tetris{
             }
         }
 
+        // this.grid[0][1]= 1;
+        // this.grid[0][2]= 1;
+        // this.grid[0][3]= 1;
+        // this.grid[0][4]= 1;
+        // this.grid[0][5]= 1;
 
-        // this.grid[10][18] = 1;
+        // this.grid[4][90] = 1;
+        // this.grid[4][91] = 1;
+        // // this.grid[4][92] = 1;
+        // this.grid[5][90] = 1;
+        // this.grid[5][91] = 1;
+        // this.grid[5][92] = 1;
+        // this.grid[6][90] = 1;
+        // this.grid[6][91] = 1;
+        // this.grid[6][92] = 1;
         // this.grid[10][17] = 1;
         // this.grid[11][18] = 1;
         // this.grid[11][17] = 1;
