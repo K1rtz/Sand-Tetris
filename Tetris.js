@@ -22,7 +22,10 @@ export class Tetris{
         this.moveRight = false;
         this.moveLeft = false;
 
+        this.play = true;
+        this.chargeCount = 0;
 
+        this.destroyArray = []
         this.registerKeyListeners()
     }
 
@@ -44,8 +47,79 @@ export class Tetris{
         this.animate()
     }  
 
+    destroyAnimation(){
+
+
+
+        // console.log(this.chargeCount);
+        if(this.chargeCount < 10){
+            if(this.chargeCount%2==0){
+                console.log('levo')
+                console.log(this.destroyArray.length)
+                this.destroyArray.forEach(x=>{
+                //this.grid2[x.x][x.y].visited = false;
+                this.grid2[x.x][x.y].color = 'white';
+                })
+            }else{
+                console.log('desno')
+                console.log(this.destroyArray.length)
+
+                this.destroyArray.forEach(x=>{
+                    //this.grid2[x.x][x.y].visited = false;
+                    this.grid2[x.x][x.y].color = 'green';
+                })
+            }
+        }else if(this.chargeCount < 15){
+            console.log('usloseuelse')
+            console.log(this.destroyArray.length)
+            if(this.destroyArray.length!=0){
+            this.destroyArray.forEach(x=>{
+            this.grid2[x.x][x.y].visited = false;
+            this.grid2[x.x][x.y].block = false;
+             })
+            }
+
+            
+            // this.fell = true
+        }
+        else{            
+            this.swapGrids()
+            this.play = true;
+            this.chargeCount=0;
+            this.destroyArray.length = 0;
+
+        }
+        this.chargeCount++;
+    
+
+
+        for(let i = 0; i < this.cols; i++){
+            for(let j = 0; j < this.rows; j++){
+                if(this.grid2[i][j].block == false)
+                    this.ctx.fillStyle = 'black'
+                else
+                    this.ctx.fillStyle = this.grid2[i][j].color//this.grid[i][j].blockColor//color
+            
+                this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
+                // this.grid2[i][j] = {
+                //     x: i,
+                //     y: j,
+                //     color: 'background',
+                //     blockColor: 'background',
+                //     block: false,
+                //     initial: false,
+                //     visited: false
+                // }
+            }
+        }
+
+
+    }
+
+
     draw(){
 
+        console.log("backandforth?")
         //this.cells.forEach(e=>e.show())
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
@@ -55,7 +129,7 @@ export class Tetris{
                 //else if (this.grid[i][j].initial == true)
                 //this.ctx.fillStyle = 'green'
                 else
-                this.ctx.fillStyle = this.grid[i][j].blockColor//color
+                this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
             
             this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
             this.grid2[i][j] = {
@@ -64,10 +138,11 @@ export class Tetris{
                 color: 'background',
                 blockColor: 'background',
                 block: false,
-                initial: false
+                initial: false,
+                visited: false
             }
         }
-    }
+        }
     
         for(let j = this.rows-1; j >= 0; j--){
             for(let i = this.cols-1; i >= 0; i--){  
@@ -179,16 +254,16 @@ export class Tetris{
             }
         }
 
+        this.checkHits()
 
         if(this.fell == true){
             this.dodajFiguru()
         }
-
+        
         this.checkForMoves()
-
-        //console.log(this.grid[this.cols-1][this.rows])
         this.swapGrids()
-        this.checkHits()
+
+
         
     }
     checkForMoves(){
@@ -267,56 +342,64 @@ checkDepleto(j){
     let color = this.grid2[0][j].blockColor;
     let niz = []
     niz.push(this.grid2[0][j]);
-    let deletoNiz = []
+    this.destroyArray = []
     let rightSideReach = false;
-    console.log('pozvanodepleto')
-    //this cols = 60 // rows = 100
+
+
     while(niz.length!=0){
-        // let current = niz.pop();
+        let current = niz.pop();
         let x = current.x
         let y = current.y
-        let color = this.grid2[x][y].blockColor
         this.grid2[x][y].visited = true;
-        deletoNiz.push(current);
-        if(current.y == this.cols.length-1){
+        this.destroyArray.push(current);
+
+        if(current.x == 59){
             rightSideReach = true;
         }
-        niz.pop();
-        //goredole
-        if(y > 0 && y < this.rows - 2){
-            //gore
-            if(this.grid2[x][y+1].block == true && this.grid2[x][y+1].blockColor == color && this.grid2[x][y+1].visited == false){
-                niz.push({x: x, y: y+1})
-                console.log("LULE")
-            }
-            // dole
-            if(this.grid2[x][y-1].block == true && this.grid2[x][y-1].blockColor == color && this.grid2[x][y-1].visited == false){
-                niz.push({x: x, y: y-1})
-                console.log("KULE")
-            }
-        }
-        if(x > 0 && x < this.cols - 2){
-            //desno
-            if(this.grid2[x+1][y].block == true && this.grid2[x+1][y].blockColor == color && this.grid2[x+1][y].visited == false){
-                niz.push({x: x+1, y: y})
-                console.log("RULE")
-            }
-            // levo
-            if(this.grid2[x-1][y].block == true && this.grid2[x-1][y].blockColor == color && this.grid2[x-1][y].visited == false){
-                niz.push({x: x-1, y: y})
-                console.log("SULE")
-            }
-        }
 
+        if(y > -1 && y < this.rows){
+            //dole
+            if(y < 99){
+                if(this.grid2[x][y+1].block == true && this.grid2[x][y+1].blockColor == color && this.grid2[x][y+1].visited == false){
+                    niz.push({x: x, y: y+1})
+                }
+            }
+            if(y > 0){
+
+                if(this.grid2[x][y-1].block == true && this.grid2[x][y-1].blockColor == color && this.grid2[x][y-1].visited == false){
+                    niz.push({x: x, y: y-1})
+                }
+            }
+        }
+        if(x > -1 && x < this.cols){
+            if(x < 59){
+                if(this.grid2[x+1][y].block == true && this.grid2[x+1][y].blockColor == color && this.grid2[x+1][y].visited == false){
+                    niz.push({x: x+1, y: y})
+                }
+            }
+            if(x>0){
+                if(this.grid2[x-1][y].block == true && this.grid2[x-1][y].blockColor == color && this.grid2[x-1][y].visited == false){
+                    niz.push({x: x-1, y: y})
+                }
+            }
+        }
     }
     if(rightSideReach){
         console.log("POGODAKPOGUSCEMP");
-    }
-    console.log(deletoNiz.length)
-    deletoNiz.forEach(x=>{
-        this.grid2[x.x][x.y].block = false;
-    })
+        this.play=false;
+        //this.destroyAnimation();
+    }else{
+        this.destroyArray.forEach(x=>{
+            this.grid2[x.x][x.y].visited = false;
+            // this.grid2[x.x][x.y].block = false;
+        })
+        this.destroyArray.length = 0;
 
+    }
+
+        
+    
+        
 }
 
 dfs(){
@@ -329,25 +412,25 @@ dfs(){
 // this.grid[0][j].blockColor= 'green'
 
     dodajFiguru(){
-        this.fell = false;
         //grid 2 vise nema initial true kockice
-
+        
         let colors = ['red', 'blue', 'green']
-
-
+        
+        
         let rnd = Math.floor(Math.random() * colors.length);
         // console.log(rnd);
         for(let i = 20; i < 30; i++){
             for(let j = 10; j < 20; j++){
                 this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
-                                         rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                                         rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+                rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+                rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
                 this.grid2[i][j].blockColor = colors[rnd];
                 this.grid2[i][j].block = true;
                 this.grid2[i][j].initial = true;
                 this.grid2[i][j].visited = false;
             }
         }
+        this.fell = false;
         // console.log( rnd + "dddddddddddddddddddd")
         // console.log('pozvano je dodaj figuru')
 
@@ -358,10 +441,16 @@ dfs(){
         const factor = Math.random();
     
         var r = Math.round(baseColor.r * factor);
-        const g = Math.round(baseColor.g * factor);
-        const b = Math.round(baseColor.b * factor);
-        if(r<100){
-            r=100;
+        var g = Math.round(baseColor.g * factor);
+        var b = Math.round(baseColor.b * factor);
+        if(baseColor.r == 255 && r < 60){
+            r = 150;
+        }
+        if(baseColor.g == 255 && g < 60){
+            g = 150;
+        }
+        if(baseColor.b == 255 && b < 60){
+            b = 150;
         }
 
         return `rgb(${r}, ${g}, ${b})`;
@@ -421,10 +510,17 @@ dfs(){
         //const frameDelay = 200;
         const currentTime = performance.now()
         if (currentTime - this.lastFrameTime >= this.frameDelay) {
-            this.ctx.resetTransform()
-            this.ctx.clearRect(0, 0, this.width, this.height)
-            this.draw()
-            
+            if(this.play){
+                this.ctx.resetTransform()
+                this.ctx.clearRect(0, 0, this.width, this.height)
+                this.draw()
+                this.checkForMoves()
+            }
+            else{
+                this.destroyAnimation();
+            }
+
+
             this.lastFrameTime = currentTime
         }
         requestAnimationFrame(()=>this.animate())
