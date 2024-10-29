@@ -27,18 +27,32 @@ export class Tetris{
 
         this.destroyArray = []
         this.registerKeyListeners()
+
+
+        this.pronadjen = false
+
+
+
     }
 
     registerKeyListeners(){
         window.addEventListener('keydown', (event)=>{
             if(event.key === 'ArrowLeft'){
                 this.moveLeft = true;
-                // console.log('levo')
             } else if(event.key === 'ArrowRight'){
                 this.moveRight = true;
-                // console.log('desno')
             }
         })
+    
+        window.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowLeft') {
+                this.moveLeft = false;
+                // this.stopMoving();
+            } else if (event.key === 'ArrowRight') {
+                this.moveRight = false;
+                // this.stopMoving();
+            }
+        }); 
     }
 
     start(){
@@ -49,7 +63,8 @@ export class Tetris{
 
     destroyAnimation(){
 
-
+        console.log("INSIDE DESTROY ANIMATION")
+        console.log("LENGTH OF ARRAY IS: " + this.destroyArray.length)
 
         // console.log(this.chargeCount);
         if(this.chargeCount < 10){
@@ -73,22 +88,32 @@ export class Tetris{
             console.log('usloseuelse')
             console.log(this.destroyArray.length)
             if(this.destroyArray.length!=0){
-            this.destroyArray.forEach(x=>{
-            this.grid2[x.x][x.y].visited = false;
-            this.grid2[x.x][x.y].block = false;
-             })
+            // this.destroyArray.forEach(x=>{
+            // this.grid2[x.x][x.y].visited = false;
+            // this.grid2[x.x][x.y].block = false;
+            //  })
+            this.unisti().then(()=>{
+               this.play = true
+               this.swapGrids()
+               this.chargeCount = 0
+               this.destroyArray.length = 0;
+               this.pronadjen = false;
+            }
+            );
+
             }
 
             
             // this.fell = true
         }
-        else{            
-            this.swapGrids()
-            this.play = true;
-            this.chargeCount=0;
-            this.destroyArray.length = 0;
+        else{        
+        }    
+            // this.swapGrids()
+            //this.play = true;
+            // this.chargeCount=0;
+            // this.destroyArray.length = 0;
 
-        }
+        // }
         this.chargeCount++;
     
 
@@ -114,6 +139,13 @@ export class Tetris{
         }
 
 
+    }
+
+    async unisti(){
+        this.destroyArray.forEach(x=>{
+            this.grid2[x.x][x.y].visited = false;
+            this.grid2[x.x][x.y].block = false;
+             })
     }
 
 
@@ -173,7 +205,7 @@ export class Tetris{
                         if(this.grid[i][j].initial){
                             this.fell = true;
                         }
-
+                        let z = Math.random();
                         if(i<59){
                             dRight = this.grid[i+1][j+1]
                         }else{
@@ -186,31 +218,39 @@ export class Tetris{
                         }
                         //PROVERA DOLE DESNO
                         if(dRight != undefined && dRight.block === false){
-                            this.grid[i][j].block  = false
-                            // this.grid[i][j].initial = false;
+                            // let x = Math.random()
+                            // if(x>0.3){
 
-                            this.grid[i+1][j+1].block  = true
-                            this.grid[i+1][j+1].initial = true;
-
-                            this.grid2[i+1][j+1].block  = true
-                            this.grid2[i+1][j+1].initial  = this.grid[i][j].initial
-                            this.grid2[i+1][j+1].color  = this.grid[i][j].color
-                            this.grid2[i+1][j+1].blockColor  = this.grid[i][j].blockColor
+                                this.grid[i][j].block  = false
+                                // this.grid[i][j].initial = false;
+                                
+                                this.grid[i+1][j+1].block  = true
+                                this.grid[i+1][j+1].initial = true;
+                                
+                                this.grid2[i+1][j+1].block  = true
+                                this.grid2[i+1][j+1].initial  = this.grid[i][j].initial
+                                this.grid2[i+1][j+1].color  = this.grid[i][j].color
+                                this.grid2[i+1][j+1].blockColor  = this.grid[i][j].blockColor
+                            // }
 
 
                         }
                         //PROVERA DOLE LEVO
-                        else if(dLeft != undefined && dLeft.block === false){
-                            this.grid[i][j].block  = false
-                            // this.grid[i][j].initial  = false
-
-                            this.grid[i-1][j+1].block  = true
-                            this.grid[i-1][j+1].initial  = true
-
-                            this.grid2[i-1][j+1].block  = true
-                            this.grid2[i-1][j+1].initial  = this.grid[i][j].initial
-                            this.grid2[i-1][j+1].color  = this.grid[i][j].color
-                            this.grid2[i-1][j+1].blockColor  = this.grid[i][j].blockColor
+                        else if(dLeft != undefined && dLeft.block === false && z>0.4){
+                            // let x = Math.random();
+                            // if(x>0.5){
+                                
+                                this.grid[i][j].block  = false
+                                // this.grid[i][j].initial  = false
+                                
+                                this.grid[i-1][j+1].block  = true
+                                this.grid[i-1][j+1].initial  = true
+                                
+                                this.grid2[i-1][j+1].block  = true
+                                this.grid2[i-1][j+1].initial  = this.grid[i][j].initial
+                                this.grid2[i-1][j+1].color  = this.grid[i][j].color
+                                this.grid2[i-1][j+1].blockColor  = this.grid[i][j].blockColor
+                            // }
 
                         }
                         else{
@@ -254,14 +294,21 @@ export class Tetris{
             }
         }
 
-        this.checkHits()
-
+        
         if(this.fell == true){
-            this.dodajFiguru()
+            this.dodajFiguru().then(()=>{
+                this.fell = false
+                this.checkForMoves()
+                this.swapGrids()
+                this.checkHits()
+            })
+        }else{
+            this.checkForMoves()
+            this.swapGrids()
+            this.checkHits()
+
         }
         
-        this.checkForMoves()
-        this.swapGrids()
 
 
         
@@ -286,7 +333,7 @@ export class Tetris{
 
 
 
-            this.moveRight = false
+            // this.moveRight = false
         }
         if(this.moveLeft){
             
@@ -306,7 +353,7 @@ export class Tetris{
             }
 
 
-            this.moveLeft = false
+            // this.moveLeft = false
         }
 
     }
@@ -320,7 +367,7 @@ export class Tetris{
             
             if(this.grid2[0][j].block == true){                   //ako postoji kockica koja je pala na to polje
 
-                if(currentColor != lastColor){                    //ako je njena boja razlicita od prethodne
+                if(currentColor != lastColor && this.pronadjen == false){   //ovde greska jer nastavlja dalje                 //ako je njena boja razlicita od prethodne
                     // x++;
                     // this.grid[0][j].blockColor = 'purple'         //oboji tu kockicu ljubicasto
                     this.checkDepleto(j)
@@ -342,7 +389,7 @@ checkDepleto(j){
     let color = this.grid2[0][j].blockColor;
     let niz = []
     niz.push(this.grid2[0][j]);
-    this.destroyArray = []
+    //this.destroyArray = []
     let rightSideReach = false;
 
 
@@ -384,9 +431,12 @@ checkDepleto(j){
             }
         }
     }
-    if(rightSideReach){
+    if(rightSideReach && this.destroyArray.length !=0){
+
         console.log("POGODAKPOGUSCEMP");
+        console.log(this.destroyArray.length)
         this.play=false;
+        this.pronadjen = true;
         //this.destroyAnimation();
     }else{
         this.destroyArray.forEach(x=>{
@@ -411,7 +461,7 @@ dfs(){
 // this.grid[0][j].block = true
 // this.grid[0][j].blockColor= 'green'
 
-    dodajFiguru(){
+    async dodajFiguru(){
         //grid 2 vise nema initial true kockice
         
         let colors = ['red', 'blue', 'green']
@@ -428,6 +478,10 @@ dfs(){
                 this.grid2[i][j].block = true;
                 this.grid2[i][j].initial = true;
                 this.grid2[i][j].visited = false;
+                this.grid[i][j].blockColor = colors[rnd];
+                this.grid[i][j].block = true;
+                this.grid[i][j].initial = true;
+                this.grid[i][j].visited = false;
             }
         }
         this.fell = false;
