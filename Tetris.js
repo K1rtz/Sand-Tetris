@@ -16,7 +16,7 @@ export class Tetris{
 
         this.ctx
 
-        this.frameDelay = 30;
+        this.frameDelay = 40;
 
         this.fell = false;
         this.moveRight = false;
@@ -464,26 +464,92 @@ dfs(){
     async dodajFiguru(){
         //grid 2 vise nema initial true kockice
         
+        let figurines = Math.floor(Math.random() * 3)
+
+
+
         let colors = ['red', 'blue', 'green']
         
-        
-        let rnd = Math.floor(Math.random() * colors.length);
-        // console.log(rnd);
-        for(let i = 20; i < 30; i++){
-            for(let j = 10; j < 20; j++){
-                this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
-                rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
-                this.grid2[i][j].blockColor = colors[rnd];
-                this.grid2[i][j].block = true;
-                this.grid2[i][j].initial = true;
-                this.grid2[i][j].visited = false;
-                this.grid[i][j].blockColor = colors[rnd];
-                this.grid[i][j].block = true;
-                this.grid[i][j].initial = true;
-                this.grid[i][j].visited = false;
+        if(figurines == 0){
+
+            let rnd = Math.floor(Math.random() * colors.length);
+            // console.log(rnd);
+            for(let i = 24; i < 36; i++){
+                for(let j = 5; j < 17; j++){
+                    this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+                    rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+                    rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+                    this.grid2[i][j].blockColor = colors[rnd];
+                    this.grid2[i][j].block = true;
+                    this.grid2[i][j].initial = true;
+                    this.grid2[i][j].visited = false;
+                    this.grid[i][j].blockColor = colors[rnd];
+                    this.grid[i][j].block = true;
+                    this.grid[i][j].initial = true;
+                    this.grid[i][j].visited = false;
+                }
             }
+            
+        }   
+        else if(figurines == 1){
+
+            let rnd = Math.floor(Math.random() * colors.length);
+            // console.log(rnd);
+            for(let i = 24; i < 36; i++){
+                for(let j = 5; j < 17; j++){
+                    if(j>12 || (i>27 && i<32 && j>8)){
+
+                        this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+                        rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+                        rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+                        this.grid2[i][j].blockColor = colors[rnd];
+                        this.grid2[i][j].block = true;
+                        this.grid2[i][j].initial = true;
+                        this.grid2[i][j].visited = false;
+                        this.grid[i][j].blockColor = colors[rnd];
+                        this.grid[i][j].block = true;
+                        this.grid[i][j].initial = true;
+                        this.grid[i][j].visited = false;
+                    }
+                }
+            }
+            
         }
+        else if(figurines == 2){
+
+            let rnd = Math.floor(Math.random() * colors.length);
+            // console.log(rnd);
+            for(let i = 20; i < 40; i++){
+                for(let j = 5; j < 17; j++){
+                    if(j>8 && j < 13){
+
+                        this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+                        rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+                        rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+                        this.grid2[i][j].blockColor = colors[rnd];
+                        this.grid2[i][j].block = true;
+                        this.grid2[i][j].initial = true;
+                        this.grid2[i][j].visited = false;
+                        this.grid[i][j].blockColor = colors[rnd];
+                        this.grid[i][j].block = true;
+                        this.grid[i][j].initial = true;
+                        this.grid[i][j].visited = false;
+                    }
+                }
+            }
+            
+        }   
+
+
+
+
+
+
+
+
+
+
+
         this.fell = false;
         // console.log( rnd + "dddddddddddddddddddd")
         // console.log('pozvano je dodaj figuru')
