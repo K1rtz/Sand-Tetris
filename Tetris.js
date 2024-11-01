@@ -30,6 +30,10 @@ export class Tetris{
 
 
         this.pronadjen = false
+        this.rotate = false
+
+
+        this.score = 0.0;
 
 
 
@@ -53,6 +57,12 @@ export class Tetris{
                 // this.stopMoving();
             }
         }); 
+
+        window.addEventListener('keydown', (event)=>{
+            if(event.key === 'ArrowUp'){
+                this.rotate = true;
+            }
+        })
     }
 
     start(){
@@ -69,13 +79,20 @@ export class Tetris{
         score.classList.add('score')
         scoreHolder.appendChild(score);
 
-        score.innerHTML = '200 000 000'
+        score.innerHTML = '0'
 
+        this.updateScore();
 
         this.createCanvas(main)
         this.draw()
         this.animate()
     }  
+
+    updateScore(){
+        let score = document.body.querySelector('.score');
+        score.innerHTML = this.score;
+    }
+
 
     destroyAnimation(){
 
@@ -104,6 +121,8 @@ export class Tetris{
             console.log('usloseuelse')
             console.log(this.destroyArray.length)
             if(this.destroyArray.length!=0){
+                this.score+= this.destroyArray.length;
+                this.updateScore()
             // this.destroyArray.forEach(x=>{
             // this.grid2[x.x][x.y].visited = false;
             // this.grid2[x.x][x.y].block = false;
@@ -162,6 +181,13 @@ export class Tetris{
         this.grid2[x.x][x.y].block = false;
             })
     }
+
+
+    rotation(){
+        
+    }
+
+
     draw(){
 
         console.log("backandforth?")
@@ -173,6 +199,9 @@ export class Tetris{
                 
                 //else if (this.grid[i][j].initial == true)
                 //this.ctx.fillStyle = 'green'
+                else if(this.grid[i][j].center == true){
+                    this.ctx.fillStyle = 'orange'
+                }
                 else
                 this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
             
@@ -184,11 +213,13 @@ export class Tetris{
                 blockColor: 'background',
                 block: false,
                 initial: false,
-                visited: false
+                visited: false,
+                center: false
             }
         }
         }
 
+        //updejtovanje druge
         for(let j = this.rows-1; j >= 0; j--){
             for(let i = this.cols-1; i >= 0; i--){  
 
@@ -202,6 +233,7 @@ export class Tetris{
 
                         this.grid[i][j].block = false;
                         // this.grid[i][j].initial = false;
+                        
 
                         this.grid[i][j+1].block = true;
                         // this.grid[i][j+1].initial = true;
@@ -210,6 +242,9 @@ export class Tetris{
                         this.grid2[i][j+1].initial = this.grid[i][j].initial
                         this.grid2[i][j+1].color = this.grid[i][j].color
                         this.grid2[i][j+1].blockColor = this.grid[i][j].blockColor
+                        this.grid2[i][j+1].center = this.grid[i][j].center
+                        this.grid[i][j+1].center = false;
+
                     }
                     //AKO IMA NESTO ISPOD BLOKA PROVERAVA DOLE LEVO I DOLE DESNO
                     else if(below != undefined && below.block == true){
@@ -266,6 +301,7 @@ export class Tetris{
                             // }
 
                         }
+                        //OSTANE TU GDE JESTE JER NEMA GDE DA PADNE?
                         else{
                             this.grid2[i][j].block = true;
                             this.grid2[i][j].initial = this.grid[i][j].initial
@@ -277,6 +313,7 @@ export class Tetris{
 
                         }
                     }
+                    //AKO JE NA DNU KANVASA
                     else{
                         this.grid2[i][j].block = true;
                         this.grid2[i][j].initial = this.grid[i][j].initial;
@@ -416,33 +453,56 @@ export class Tetris{
             if(current.x == 59){
                 rightSideReach = true;
             }
-
+            //LEVODESNOGOREDOLE
             if(y > -1 && y < this.rows){
                 //dole
                 if(y < 99){
-                    if(this.grid2[x][y+1].block == true && this.grid2[x][y+1].blockColor == color && this.grid2[x][y+1].visited == false){
+                    if(this.grid2[x][y+1].block == true && this.grid2[x][y+1].blockColor == color && this.grid2[x][y+1].visited == false && this.grid2[x][y+1].initial==false){
                         niz.push({x: x, y: y+1})
                     }
                 }
                 if(y > 0){
 
-                    if(this.grid2[x][y-1].block == true && this.grid2[x][y-1].blockColor == color && this.grid2[x][y-1].visited == false){
+                    if(this.grid2[x][y-1].block == true && this.grid2[x][y-1].blockColor == color && this.grid2[x][y-1].visited == false && this.grid2[x][y-1].initial==false){
                         niz.push({x: x, y: y-1})
                     }
                 }
             }
             if(x > -1 && x < this.cols){
                 if(x < 59){
-                    if(this.grid2[x+1][y].block == true && this.grid2[x+1][y].blockColor == color && this.grid2[x+1][y].visited == false){
+                    if(this.grid2[x+1][y].block == true && this.grid2[x+1][y].blockColor == color && this.grid2[x+1][y].visited == false&& this.grid2[x+1][y].initial==false ){
                         niz.push({x: x+1, y: y})
                     }
                 }
                 if(x>0){
-                    if(this.grid2[x-1][y].block == true && this.grid2[x-1][y].blockColor == color && this.grid2[x-1][y].visited == false){
+                    if(this.grid2[x-1][y].block == true && this.grid2[x-1][y].blockColor == color && this.grid2[x-1][y].visited == false&& this.grid2[x-1][y].initial==false){
                         niz.push({x: x-1, y: y})
                     }
                 }
             }
+            //UKOSO
+            if (y<this.rows-1 && x < this.cols-1){
+                if(this.grid2[x+1][y+1].block == true && this.grid2[x+1][y+1].blockColor == color && this.grid2[x+1][y+1].visited == false && this.grid2[x+1][y+1].initial==false){
+                    niz.push({x: x+1, y: y+1})
+                } 
+            }
+            if(y< this.rows-1 && x>0){
+                if(this.grid2[x-1][y+1].block == true && this.grid2[x-1][y+1].blockColor == color && this.grid2[x-1][y+1].visited == false && this.grid2[x-1][y+1].initial==false){
+                    niz.push({x: x-1, y: y+1})
+                } 
+            }
+            if(y>0 && x > 0){
+                if(this.grid2[x-1][y-1].block == true && this.grid2[x-1][y-1].blockColor == color && this.grid2[x-1][y-1].visited == false && this.grid2[x-1][y-1].initial==false){
+                    niz.push({x: x-1, y: y-1})
+                } 
+            }
+            if(y>0 && x<this.cols-1){
+                if(this.grid2[x+1][y-1].block == true && this.grid2[x+1][y-1].blockColor == color && this.grid2[x+1][y-1].visited == false && this.grid2[x+1][y-1].initial==false){
+                    niz.push({x: x+1, y: y-1})
+                } 
+            }
+
+
         }
         if(rightSideReach && this.destroyArray.length !=0){
 
@@ -478,7 +538,7 @@ export class Tetris{
 
 
         let colors = ['red', 'blue', 'green']
-        
+        // figurines = 2;
         if(figurines == 0){
 
             let rnd = Math.floor(Math.random() * colors.length);
@@ -496,6 +556,10 @@ export class Tetris{
                     this.grid[i][j].block = true;
                     this.grid[i][j].initial = true;
                     this.grid[i][j].visited = false;
+                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                        this.grid[i][j].center = true;
+                        this.grid2[i][j].center = true;
+                    }
                 }
             }
             
@@ -520,6 +584,10 @@ export class Tetris{
                         this.grid[i][j].initial = true;
                         this.grid[i][j].visited = false;
                     }
+                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                        this.grid[i][j].center = true;
+                        this.grid2[i][j].center = true;
+                    }
                 }
             }
             
@@ -528,7 +596,7 @@ export class Tetris{
 
             let rnd = Math.floor(Math.random() * colors.length);
             // console.log(rnd);
-            for(let i = 20; i < 40; i++){
+            for(let i = 24; i < 36; i++){
                 for(let j = 5; j < 17; j++){
                     if(j>8 && j < 13){
 
@@ -544,6 +612,11 @@ export class Tetris{
                         this.grid[i][j].initial = true;
                         this.grid[i][j].visited = false;
                     }
+                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                        this.grid[i][j].center = true;
+                        this.grid2[i][j].center = true;
+                    }
+
                 }
             }
             
