@@ -184,12 +184,55 @@ export class Tetris{
 
 
     rotation(){
-        
+
+        let obj = null;
+        this.grid.forEach(row =>{
+            if(!obj){
+                obj = row.find(cell => cell.center === true);
+            }
+        })
+
+        let matrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
+
+        for(let i = obj.x-4; i< obj.x+8;i++){
+            for(let j = obj.y-4; j< obj.y+8;j++){
+
+                matrix[i-obj.x+4][j-obj.y+4] = this.grid[i][j];
+            }
+        }
+        for(let i = 0; i < 12; i++){
+            for(let j = 0; j< 12; j++){
+                [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]]
+            }
+        }
+        // for (let i = 0; i < 12; i++) {
+        //     matrix[i].reverse();
+        // }
+
+        const rotatedMatrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
+        for (let i = 0; i < 12; i++) {
+            for (let j = 0; j < 12; j++) {
+                rotatedMatrix[j][11 - i] = matrix[i][j];
+            }
+        }
+
+        for(let i = obj.x-4; i< obj.x+8;i++){
+            for(let j = obj.y-4; j< obj.y+8;j++){
+                this.grid[i][j] = rotatedMatrix[i-obj.x+4][j-obj.y+4];
+            }
+        }
+
+        console.log(obj);
+        this.rotate = false;
+
     }
 
 
     draw(){
 
+        if(this.rotate){
+            this.rotation()
+        }
         console.log("backandforth?")
         //this.cells.forEach(e=>e.show())
         for(let i = 0; i < this.cols; i++){
@@ -377,13 +420,13 @@ export class Tetris{
                         this.grid2[i+1][j].initial = true
                         this.grid2[i+1][j].color = this.grid2[i][j].color
                         this.grid2[i+1][j].blockColor = this.grid2[i][j].blockColor
+                        this.grid2[i+1][j].center = this.grid2[i][j].center
                     }
                 }
             }
 
 
 
-            // this.moveRight = false
         }
         if(this.moveLeft){
             
@@ -397,21 +440,16 @@ export class Tetris{
                         this.grid2[i-1][j].initial = true
                         this.grid2[i-1][j].color =  this.grid2[i][j].color
                         this.grid2[i-1][j].blockColor =  this.grid2[i][j].blockColor
+                        this.grid2[i-1][j].center = this.grid2[i][j].center
                     }
                 }
-                // console.log(this.cols)
             }
-
-
-            // this.moveLeft = false
         }
-
     }
 
     checkHits(){
 
         let lastColor = null
-        // let x = 1;
         for(let j = this.rows-1; j >= 0; j--){                    //od 99 do 0
             let currentColor = this.grid2[0][j].blockColor;       //boja poslednjeg elementa u prvoj koloni
             
@@ -439,7 +477,6 @@ export class Tetris{
         let color = this.grid2[0][j].blockColor;
         let niz = []
         niz.push(this.grid2[0][j]);
-        //this.destroyArray = []
         let rightSideReach = false;
 
 
@@ -510,11 +547,9 @@ export class Tetris{
             console.log(this.destroyArray.length)
             this.play=false;
             this.pronadjen = true;
-            //this.destroyAnimation();
         }else{
             this.destroyArray.forEach(x=>{
                 this.grid2[x.x][x.y].visited = false;
-                // this.grid2[x.x][x.y].block = false;
             })
             this.destroyArray.length = 0;
 
@@ -531,14 +566,10 @@ export class Tetris{
 
 
     async dodajFiguru(){
-        //grid 2 vise nema initial true kockice
         
         let figurines = Math.floor(Math.random() * 3)
 
-
-
         let colors = ['red', 'blue', 'green']
-        // figurines = 2;
         if(figurines == 0){
 
             let rnd = Math.floor(Math.random() * colors.length);
@@ -560,6 +591,7 @@ export class Tetris{
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
+
                 }
             }
             
@@ -567,7 +599,6 @@ export class Tetris{
         else if(figurines == 1){
 
             let rnd = Math.floor(Math.random() * colors.length);
-            // console.log(rnd);
             for(let i = 24; i < 36; i++){
                 for(let j = 5; j < 17; j++){
                     if(j>12 || (i>27 && i<32 && j>8)){
@@ -588,6 +619,7 @@ export class Tetris{
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
+
                 }
             }
             
@@ -595,7 +627,6 @@ export class Tetris{
         else if(figurines == 2){
 
             let rnd = Math.floor(Math.random() * colors.length);
-            // console.log(rnd);
             for(let i = 24; i < 36; i++){
                 for(let j = 5; j < 17; j++){
                     if(j>8 && j < 13){
@@ -616,25 +647,13 @@ export class Tetris{
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
-
                 }
             }
             
         }   
 
 
-
-
-
-
-
-
-
-
-
         this.fell = false;
-        // console.log( rnd + "dddddddddddddddddddd")
-        // console.log('pozvano je dodaj figuru')
 
     }
 
@@ -669,8 +688,6 @@ export class Tetris{
         canvas.height = this.height;
         this.cols = this.width/this.w;
         this.rows = this.height/this.w;
-        // this.grid = new Array(this.cols).fill(0).map(() => new Array(this.rows).fill(0));
-        // this.grid2 = new Array(this.cols).fill(0).map(() => new Array(this.rows).fill(0));
 
         this.grid = []
         this.grid2 = []
@@ -709,7 +726,6 @@ export class Tetris{
     }
 
     animate(){
-        //const frameDelay = 200;
         const currentTime = performance.now()
         if (currentTime - this.lastFrameTime >= this.frameDelay) {
             if(this.play){
