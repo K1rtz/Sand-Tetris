@@ -34,8 +34,7 @@ export class Tetris{
 
 
         this.score = 0.0;
-
-
+        this.coin=false;
 
     }
 
@@ -59,8 +58,9 @@ export class Tetris{
         }); 
 
         window.addEventListener('keydown', (event)=>{
-            if(event.key === 'ArrowUp'){
+            if(event.key === 'ArrowUp' && !event.repeat){
                 this.rotate = true;
+                // this.rotation()
             }
         })
     }
@@ -113,7 +113,6 @@ export class Tetris{
                 console.log(this.destroyArray.length)
 
                 this.destroyArray.forEach(x=>{
-                    //this.grid2[x.x][x.y].visited = false;
                     this.grid2[x.x][x.y].color = 'green';
                 })
             }
@@ -123,10 +122,7 @@ export class Tetris{
             if(this.destroyArray.length!=0){
                 this.score+= this.destroyArray.length;
                 this.updateScore()
-            // this.destroyArray.forEach(x=>{
-            // this.grid2[x.x][x.y].visited = false;
-            // this.grid2[x.x][x.y].block = false;
-            //  })
+
             this.unisti().then(()=>{
                 this.play = true
                 this.swapGrids()
@@ -183,7 +179,7 @@ export class Tetris{
     }
 
 
-    rotation(){
+    async rotation(){
 
         let obj = null;
         this.grid.forEach(row =>{
@@ -191,6 +187,15 @@ export class Tetris{
                 obj = row.find(cell => cell.center === true);
             }
         })
+        if(obj.x<4){
+            obj.x=4;
+        }
+        if(obj.x>this.cols-8){
+            obj.x=this.cols-8
+        }
+        if(obj.y>this.rows-8){
+            obj.y=this.rows-8
+        }
 
         let matrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
 
@@ -205,9 +210,7 @@ export class Tetris{
                 [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]]
             }
         }
-        // for (let i = 0; i < 12; i++) {
-        //     matrix[i].reverse();
-        // }
+
 
         const rotatedMatrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
         for (let i = 0; i < 12; i++) {
@@ -216,13 +219,16 @@ export class Tetris{
             }
         }
 
+
         for(let i = obj.x-4; i< obj.x+8;i++){
             for(let j = obj.y-4; j< obj.y+8;j++){
+ 
+                // if(rotatedMatrix[i-obj.x+4][j-obj.y+4].initial || this.grid[i][j].block)
                 this.grid[i][j] = rotatedMatrix[i-obj.x+4][j-obj.y+4];
             }
         }
+        //console.log(rotatedMatrix);
 
-        console.log(obj);
         this.rotate = false;
 
     }
@@ -230,9 +236,9 @@ export class Tetris{
 
     draw(){
 
-        if(this.rotate){
-            this.rotation()
-        }
+        // if(this.rotate){
+        //     this.rotation()
+        // }
         console.log("backandforth?")
         //this.cells.forEach(e=>e.show())
         for(let i = 0; i < this.cols; i++){
@@ -242,9 +248,9 @@ export class Tetris{
                 
                 //else if (this.grid[i][j].initial == true)
                 //this.ctx.fillStyle = 'green'
-                else if(this.grid[i][j].center == true){
-                    this.ctx.fillStyle = 'orange'
-                }
+                // else if(this.grid[i][j].center == true){
+                    // this.ctx.fillStyle = 'orange'
+                // }
                 else
                 this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
             
@@ -402,20 +408,29 @@ export class Tetris{
 
         }
         
-
+        // if(this.rotate)
+        //     this.rotation()
 
         
     }
     checkForMoves(){
-        if(this.moveRight){
+        // if(!this.rotate){
 
+            if(this.moveRight){
+                
+                let val = true;
+            for(let x = 0; x < this.rows; x++){
+                if(this.grid2[this.cols-1][x].initial == true)
+                    val = false;
+            }
+            
             for(let i = this.cols-2; i >= 0; i--){ 
                 for(let j = 0; j < this.rows; j++){
-
-                    if(this.grid2[i][j].block == true && this.grid2[i][j].initial == true &&  this.grid2[i+1][j].block == false){
+                    
+                    if(val && this.grid2[i][j].block == true && this.grid2[i][j].initial == true &&  this.grid2[i+1][j].block == false){
                         this.grid2[i][j].block = false
                         this.grid2[i][j].initial = false
-
+                        
                         this.grid2[i+1][j].block = true
                         this.grid2[i+1][j].initial = true
                         this.grid2[i+1][j].color = this.grid2[i][j].color
@@ -424,29 +439,39 @@ export class Tetris{
                     }
                 }
             }
-
-
-
+            
+            
+            
         }
         if(this.moveLeft){
             
+            let val = true;
+            for(let x = 0; x < this.rows; x++){
+                if(this.grid2[0][x].initial == true)
+                    val = false;
+            }
+            
             for(let i = 1; i < this.cols; i++){  
                 for(let j = 0; j < this.rows; j++){
-                    if(this.grid2[i][j].block == true && this.grid2[i][j].initial == true && this.grid2[i-1][j].initial == false){
+                    if(val && this.grid2[i][j].block == true && this.grid2[i][j].initial == true && this.grid2[i-1][j].initial == false){
+                        
                         this.grid2[i][j].block = false
                         this.grid2[i][j].initial = false
-
+                        
                         this.grid2[i-1][j].block = true
                         this.grid2[i-1][j].initial = true
                         this.grid2[i-1][j].color =  this.grid2[i][j].color
                         this.grid2[i-1][j].blockColor =  this.grid2[i][j].blockColor
                         this.grid2[i-1][j].center = this.grid2[i][j].center
                     }
+
+                    
                 }
             }
         }
+    // }
     }
-
+    
     checkHits(){
 
         let lastColor = null
@@ -568,7 +593,7 @@ export class Tetris{
     async dodajFiguru(){
         
         let figurines = Math.floor(Math.random() * 3)
-
+        figurines = 1
         let colors = ['red', 'blue', 'green']
         if(figurines == 0){
 
@@ -732,12 +757,14 @@ export class Tetris{
                 this.ctx.resetTransform()
                 this.ctx.clearRect(0, 0, this.width, this.height)
                 this.draw()
+                
+
                 this.checkForMoves()
+                
             }
             else{
                 this.destroyAnimation();
             }
-
 
             this.lastFrameTime = currentTime
         }
