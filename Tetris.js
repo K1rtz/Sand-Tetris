@@ -33,8 +33,13 @@ export class Tetris{
         this.rotate = false
 
 
+
+
         this.score = 0.0;
         this.coin=false;
+
+        this.isMoving=false;
+        this.isRotating=false;
 
     }
 
@@ -179,10 +184,12 @@ export class Tetris{
     }
 
 
-    async rotation(){
-
+    rotation(){
+        // if(!this.isRotating){
+        //     this.isRotating=true;
+        console.log("ZAPOCETA ROTACIJA")
         let obj = null;
-        this.grid.forEach(row =>{
+        this.grid2.forEach(row =>{
             if(!obj){
                 obj = row.find(cell => cell.center === true);
             }
@@ -196,26 +203,64 @@ export class Tetris{
         if(obj.y>this.rows-8){
             obj.y=this.rows-8
         }
+        // let fix = false
+        // for(let x = obj.y-4; x <obj.y+8; x++){
+        //     for(let y = obj.x; y <obj.x+8; y++){
+        //         if(this.grid2[y][x].block && !this.grid2[y][x].initial)
+        //             fix = true
+        //     }
+        // }
+        // if(fix){
+        //     obj.y=80;
+        //     obj.x=4;
+        // }
+        
+
 
         let matrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
 
+        //samo prebacimo sve okolko figure u novu matricu
         for(let i = obj.x-4; i< obj.x+8;i++){
             for(let j = obj.y-4; j< obj.y+8;j++){
 
-                matrix[i-obj.x+4][j-obj.y+4] = this.grid[i][j];
-            }
-        }
-        for(let i = 0; i < 12; i++){
-            for(let j = 0; j< 12; j++){
-                [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]]
+                matrix[i-obj.x+4][j-obj.y+4] = {...this.grid2[i][j]};
+                //console.log(matrix[11][11])
             }
         }
 
-
+        //zarotiramo te vrednosti
         const rotatedMatrix = Array.from({ length: 12 }, () => new Array(12).fill(0));
         for (let i = 0; i < 12; i++) {
             for (let j = 0; j < 12; j++) {
-                rotatedMatrix[j][11 - i] = matrix[i][j];
+                rotatedMatrix[j][11 - i] = {...matrix[i][j]};
+            }
+        }
+
+        // for(let i = 0; i < 12; i ++){
+        //     for(let j=0; j< 12; j++){
+        //         this.grid2[i][j] = {...rotatedMatrix[i][j]}
+        //     }
+        // }
+
+
+
+        for(let i = obj.x-4; i< obj.x+8;i++){
+            for(let j = obj.y-4; j< obj.y+8;j++){
+                
+                if(this.grid2[i][j].initial){
+                    this.grid2[i][j] = {
+                        x: i,
+                        y: j,
+                        color: 'background',
+                        blockColor: 'background',
+                        block: false,
+                        initial: false,
+                        visited: false,
+                        center: false
+                    }
+
+                    // this.grid2[i][j].color = 'pink'
+                }
             }
         }
 
@@ -223,14 +268,28 @@ export class Tetris{
         for(let i = obj.x-4; i< obj.x+8;i++){
             for(let j = obj.y-4; j< obj.y+8;j++){
  
-                // if(rotatedMatrix[i-obj.x+4][j-obj.y+4].initial || this.grid[i][j].block)
-                this.grid[i][j] = rotatedMatrix[i-obj.x+4][j-obj.y+4];
+                // if(rotatedMatrix[i-obj.x+4][j-obj.y+4].initial || this.grid2[i][j].block)
+                    // this.grid2[i][j] = rotatedMatrix[i-obj.x+4][j-obj.y+4];
+
+
+                const rotatedValue = rotatedMatrix[i - obj.x + 4][j - obj.y + 4];
+
+
+                if (rotatedValue.initial) {
+                    this.grid2[i][j] = {...rotatedValue}; 
+                }
+                
+
+
             }
         }
+
+
         //console.log(rotatedMatrix);
-
+        console.log("GOTOVA ROTACIJA")
         this.rotate = false;
-
+        // this.isRotating = false;
+        // }
     }
 
 
@@ -239,7 +298,7 @@ export class Tetris{
         // if(this.rotate){
         //     this.rotation()
         // }
-        console.log("backandforth?")
+        //console.log("backandforth?")
         //this.cells.forEach(e=>e.show())
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
@@ -392,33 +451,39 @@ export class Tetris{
                     }
             }
         }
+        if(this.rotate){
+            this.rotation()
+        }
+        if(this.moveRight || this.moveLeft){
+            this.checkForMoves()
+        }
 
-        
         if(this.fell == true){
             this.dodajFiguru().then(()=>{
                 this.fell = false
-                this.checkForMoves()
+                //this.checkForMoves()
                 this.swapGrids()
                 this.checkHits()
             })
         }else{
-            this.checkForMoves()
+            //this.checkForMoves()
             this.swapGrids()
             this.checkHits()
 
         }
         
-        // if(this.rotate)
-        //     this.rotation()
+ 
 
         
     }
+
     checkForMoves(){
         // if(!this.rotate){
-
-            if(this.moveRight){
+        console.log("ZAPOCETO POMERANJE")
+        
+        if(this.moveRight){
                 
-                let val = true;
+            let val = true;
             for(let x = 0; x < this.rows; x++){
                 if(this.grid2[this.cols-1][x].initial == true)
                     val = false;
@@ -469,6 +534,7 @@ export class Tetris{
                 }
             }
         }
+        console.log("ZAVRSENO POMERANJE")
     // }
     }
     
@@ -757,9 +823,13 @@ export class Tetris{
                 this.ctx.resetTransform()
                 this.ctx.clearRect(0, 0, this.width, this.height)
                 this.draw()
+                // if(this.moveRight || this.moveLeft){
+                //     this.checkForMoves()
+                // }
+                // if(this.rotate){
+                //     this.rotation()
+                // }
                 
-
-                this.checkForMoves()
                 
             }
             else{
