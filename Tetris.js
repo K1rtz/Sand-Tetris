@@ -76,9 +76,18 @@ export class Tetris{
         main.classList.add('main');
         this.host.appendChild(main);
 
+        let scoreAndDisplay = document.createElement('div')
+        scoreAndDisplay.classList.add('score-display')
+        main.appendChild(scoreAndDisplay)
+
+        // let pipe = document.createElement('div')
+        // pipe.classList.add('pipe')
+        // scoreAndDisplay.appendChild(pipe)
+
+
         let scoreHolder = document.createElement('div')
         scoreHolder.classList.add('scoreHolder')
-        main.appendChild(scoreHolder)
+        scoreAndDisplay.appendChild(scoreHolder)
 
         let score = document.createElement('div')
         score.classList.add('score')
@@ -88,10 +97,100 @@ export class Tetris{
 
         this.updateScore();
 
-        this.createCanvas(main)
+        this.createCanvas(scoreAndDisplay)
+        this.createForm(main)
         this.draw()
         this.animate()
+
     }  
+
+    createForm(host){
+        let formWrapper = document.createElement('div')
+        formWrapper.classList.add('form-wrapper')
+        host.appendChild(formWrapper)
+
+        const form = document.createElement('div')
+        form.classList.add('form', 'for')
+        formWrapper.appendChild(form)
+
+        const form2 = document.createElement('div')
+        form2.classList.add('form2', 'for')
+        formWrapper.appendChild(form2)
+
+        let label2 = document.createElement('label')
+        label2.innerHTML = "YOURE MOM:"
+        form2.appendChild(label2)
+        
+        const form3 = document.createElement('div')
+        form3.classList.add('form3', 'for')
+        formWrapper.appendChild(form3)
+        // form3.innerHTML = "SCORE"
+        let label3 = document.createElement('label')
+        label3.innerHTML = "SCORE:"
+        form3.appendChild(label3)
+
+        const form4 = document.createElement('div')
+        form4.classList.add('form4', 'for')
+        formWrapper.appendChild(form4)
+
+        // const form6 = document.createElement('div')
+        // form6.classList.add('form6', 'for')
+        // formWrapper.appendChild(form6)
+
+        // // let leverControl = document.getElementById("leverControl");
+        // // form6.appendChild(leverControl)
+        
+        // const glassHolder6 = document.createElement('div')
+        // glassHolder6.classList.add('glassHolder6')
+        // form6.appendChild(glassHolder6)
+
+        // const glass6 = document.createElement('div')
+        // glass6.classList.add('glass', 'glass6')
+        // glassHolder6.appendChild(glass6)
+
+
+
+
+
+
+
+        // const pepe1 = document.createElement('div')
+        // pepe1.classList.add('pepe1', 'pep')
+        // formWrapper.appendChild(pepe1)
+
+        // const pepe2 = document.createElement('div')
+        // pepe2.classList.add('pepe2', 'pep')
+        // formWrapper.appendChild(pepe2)
+
+        // const pepe3 = document.createElement('div')
+        // pepe3.classList.add('pepe3', 'pep')
+        // formWrapper.appendChild(pepe3)
+
+        // const pepe4 = document.createElement('div')
+        // pepe4.classList.add('pepe4', 'pep')
+        // formWrapper.appendChild(pepe4)
+
+        const pepeGlass = document.createElement('div')
+        // pepeGlass.classList.add('pepe4', 'pep', 'glassPepe')
+        pepeGlass.innerHTML =""
+        formWrapper.appendChild(pepeGlass)
+
+
+        // const pepeGlass2 = document.createElement('div')
+        // pepeGlass2.classList.add('pepe4', 'pep', 'glassPepe2')
+        // pepeGlass2.innerHTML =""
+        // formWrapper.appendChild(pepeGlass2)
+
+        // let pepeLabel = document.createElement('label')
+        // pepeLabel.innerHTML = "1988"
+        // pepeGlass2.appendChild(pepeLabel)
+
+
+
+
+
+
+    }
 
     updateScore(){
         let score = document.body.querySelector('.score');
@@ -187,7 +286,7 @@ export class Tetris{
     rotation(){
         // if(!this.isRotating){
         //     this.isRotating=true;
-        console.log("ZAPOCETA ROTACIJA")
+        // console.log("ZAPOCETA ROTACIJA")
         let obj = null;
         this.grid2.forEach(row =>{
             if(!obj){
@@ -284,12 +383,8 @@ export class Tetris{
             }
         }
 
-
-        //console.log(rotatedMatrix);
-        console.log("GOTOVA ROTACIJA")
         this.rotate = false;
-        // this.isRotating = false;
-        // }
+ 
     }
 
 
@@ -300,11 +395,25 @@ export class Tetris{
         // }
         //console.log("backandforth?")
         //this.cells.forEach(e=>e.show())
+        for(let i = 0; i < 30; i++){
+            if(this.grid[i][16].block && !this.grid[i][16].initial)
+                console.log('GAMELOST')
+        }
+        if(Math.random() > 0.5){
+                document.body.classList.add('gradient2')
+
+        }else{
+
+        }
+
+
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
-                if(this.grid[i][j].block == false)
+                if(this.grid[i][j].block == false && j!=16)
                     this.ctx.fillStyle = 'black'
-                
+                else if(j == 16 && this.grid[i][j].block == false){
+                    this.ctx.fillStyle = '#246A7350'
+                }
                 //else if (this.grid[i][j].initial == true)
                 //this.ctx.fillStyle = 'green'
                 // else if(this.grid[i][j].center == true){
@@ -479,7 +588,7 @@ export class Tetris{
 
     checkForMoves(){
         // if(!this.rotate){
-        console.log("ZAPOCETO POMERANJE")
+        // console.log("ZAPOCETO POMERANJE")
         
         if(this.moveRight){
                 
@@ -534,7 +643,7 @@ export class Tetris{
                 }
             }
         }
-        console.log("ZAVRSENO POMERANJE")
+        // console.log("ZAVRSENO POMERANJE")
     // }
     }
     
@@ -659,14 +768,14 @@ export class Tetris{
     async dodajFiguru(){
         
         let figurines = Math.floor(Math.random() * 3)
-        figurines = 1
+        // figurines = 1
         let colors = ['red', 'blue', 'green']
         if(figurines == 0){
 
             let rnd = Math.floor(Math.random() * colors.length);
             // console.log(rnd);
             for(let i = 24; i < 36; i++){
-                for(let j = 5; j < 17; j++){
+                for(let j = 1; j < 13; j++){
                     this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
                     rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
                     rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
@@ -678,7 +787,7 @@ export class Tetris{
                     this.grid[i][j].block = true;
                     this.grid[i][j].initial = true;
                     this.grid[i][j].visited = false;
-                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                    if(i> 27 && i < 32 && j > 4 && j < 9){
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
@@ -691,8 +800,8 @@ export class Tetris{
 
             let rnd = Math.floor(Math.random() * colors.length);
             for(let i = 24; i < 36; i++){
-                for(let j = 5; j < 17; j++){
-                    if(j>12 || (i>27 && i<32 && j>8)){
+                for(let j = 1; j < 13; j++){
+                    if(j>8 || (i>27 && i<32 && j>4)){
 
                         this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
                         rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
@@ -706,7 +815,7 @@ export class Tetris{
                         this.grid[i][j].initial = true;
                         this.grid[i][j].visited = false;
                     }
-                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                    if(i> 27 && i < 32 && j > 4 && j < 9){
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
@@ -719,8 +828,8 @@ export class Tetris{
 
             let rnd = Math.floor(Math.random() * colors.length);
             for(let i = 24; i < 36; i++){
-                for(let j = 5; j < 17; j++){
-                    if(j>8 && j < 13){
+                for(let j = 1; j < 13; j++){
+                    if(j>4 && j < 9){
 
                         this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
                         rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
@@ -734,7 +843,7 @@ export class Tetris{
                         this.grid[i][j].initial = true;
                         this.grid[i][j].visited = false;
                     }
-                    if(i> 27 && i < 32 && j > 8 && j < 13){
+                    if(i> 27 && i < 32 && j > 4 && j < 9){
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
@@ -823,9 +932,9 @@ export class Tetris{
                 this.ctx.resetTransform()
                 this.ctx.clearRect(0, 0, this.width, this.height)
                 this.draw()
-                // if(this.moveRight || this.moveLeft){
-                //     this.checkForMoves()
-                // }
+                if(this.moveRight || this.moveLeft){
+                    this.checkForMoves()
+                }
                 // if(this.rotate){
                 //     this.rotation()
                 // }
