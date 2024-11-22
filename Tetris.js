@@ -12,6 +12,7 @@ export class Tetris{
         this.cols
         this.grid
         this.grid2
+        this.nextGrid
         this.cells = []
 
         this.ctx
@@ -33,7 +34,7 @@ export class Tetris{
         this.rotate = false
 
 
-
+        this.ctx2
 
         this.score = 0.0;
         this.coin=false;
@@ -80,25 +81,12 @@ export class Tetris{
         scoreAndDisplay.classList.add('score-display')
         main.appendChild(scoreAndDisplay)
 
-        // let pipe = document.createElement('div')
-        // pipe.classList.add('pipe')
-        // scoreAndDisplay.appendChild(pipe)
 
+        //this.updateScore();
 
-        let scoreHolder = document.createElement('div')
-        scoreHolder.classList.add('scoreHolder')
-        scoreAndDisplay.appendChild(scoreHolder)
-
-        let score = document.createElement('div')
-        score.classList.add('score')
-        scoreHolder.appendChild(score);
-
-        score.innerHTML = '0'
-
-        this.updateScore();
-
-        this.createCanvas(scoreAndDisplay)
         this.createForm(main)
+        this.createCanvasNext()
+        this.createCanvas(scoreAndDisplay)
         this.draw()
         this.animate()
 
@@ -113,62 +101,56 @@ export class Tetris{
         form.classList.add('form', 'for')
         formWrapper.appendChild(form)
 
+        
+        let label2 = document.createElement('label')
+        label2.innerHTML = "SCORE:"
+        formWrapper.appendChild(label2)
         const form2 = document.createElement('div')
         form2.classList.add('form2', 'for')
         formWrapper.appendChild(form2)
-
-        let label2 = document.createElement('label')
-        label2.innerHTML = "YOURE MOM:"
-        form2.appendChild(label2)
         
+        let label3 = document.createElement('label')
+        label3.innerHTML = "LEVEL:"
+        formWrapper.appendChild(label3)
         const form3 = document.createElement('div')
         form3.classList.add('form3', 'for')
         formWrapper.appendChild(form3)
         // form3.innerHTML = "SCORE"
-        let label3 = document.createElement('label')
-        label3.innerHTML = "SCORE:"
-        form3.appendChild(label3)
 
+
+        let label4 = document.createElement('label')
+        label4.innerHTML = "BLOCKS:"
+        formWrapper.appendChild(label4)
         const form4 = document.createElement('div')
         form4.classList.add('form4', 'for')
         formWrapper.appendChild(form4)
 
-        // const form6 = document.createElement('div')
-        // form6.classList.add('form6', 'for')
+        const form6 = document.createElement('div')
+        form6.classList.add('form6', 'for')
         // formWrapper.appendChild(form6)
+        let label5 = document.createElement('label')
+        label5.innerHTML = "MUSIC:"
+        form6.appendChild(label5)
 
-        // // let leverControl = document.getElementById("leverControl");
-        // // form6.appendChild(leverControl)
+        let buttonDiv = document.createElement('div')
+        buttonDiv.classList.add('buttonDiv')
+        form6.appendChild(buttonDiv)
+
+        let lab = document.createElement('label')
+        lab.classList.add('switch')
+        buttonDiv.appendChild(lab)
         
-        // const glassHolder6 = document.createElement('div')
-        // glassHolder6.classList.add('glassHolder6')
-        // form6.appendChild(glassHolder6)
+        let input = document.createElement('input')
+        input.type = 'checkbox'
+        lab.appendChild(input)
 
-        // const glass6 = document.createElement('div')
-        // glass6.classList.add('glass', 'glass6')
-        // glassHolder6.appendChild(glass6)
+        let spa = document.createElement('span')
+        spa.classList.add('slider')
+        lab.appendChild(spa)
 
-
-
-
+        
 
 
-
-        // const pepe1 = document.createElement('div')
-        // pepe1.classList.add('pepe1', 'pep')
-        // formWrapper.appendChild(pepe1)
-
-        // const pepe2 = document.createElement('div')
-        // pepe2.classList.add('pepe2', 'pep')
-        // formWrapper.appendChild(pepe2)
-
-        // const pepe3 = document.createElement('div')
-        // pepe3.classList.add('pepe3', 'pep')
-        // formWrapper.appendChild(pepe3)
-
-        // const pepe4 = document.createElement('div')
-        // pepe4.classList.add('pepe4', 'pep')
-        // formWrapper.appendChild(pepe4)
 
         const pepeGlass = document.createElement('div')
         // pepeGlass.classList.add('pepe4', 'pep', 'glassPepe')
@@ -176,14 +158,6 @@ export class Tetris{
         formWrapper.appendChild(pepeGlass)
 
 
-        // const pepeGlass2 = document.createElement('div')
-        // pepeGlass2.classList.add('pepe4', 'pep', 'glassPepe2')
-        // pepeGlass2.innerHTML =""
-        // formWrapper.appendChild(pepeGlass2)
-
-        // let pepeLabel = document.createElement('label')
-        // pepeLabel.innerHTML = "1988"
-        // pepeGlass2.appendChild(pepeLabel)
 
 
 
@@ -769,6 +743,7 @@ export class Tetris{
         
         let figurines = Math.floor(Math.random() * 3)
         // figurines = 1
+        figurines  = 0;
         let colors = ['red', 'blue', 'green']
         if(figurines == 0){
 
@@ -787,11 +762,17 @@ export class Tetris{
                     this.grid[i][j].block = true;
                     this.grid[i][j].initial = true;
                     this.grid[i][j].visited = false;
+
+                    // this.nextGrid[i-24][j-1].color = this.grid2[i][j].color;
+                    let x =  this.grid2[i][j].color
+                    this.nextGrid[i-24][j-1].color = x
+
                     if(i> 27 && i < 32 && j > 4 && j < 9){
                         this.grid[i][j].center = true;
                         this.grid2[i][j].center = true;
                     }
 
+                    this.updateNextRect()
                 }
             }
             
@@ -879,6 +860,41 @@ export class Tetris{
 
     swapGrids(){
         this.grid = this.grid2.map(row => row.slice());
+    }
+    createCanvasNext(){
+        const canvas = document.createElement('canvas')
+        canvas.classList.add('canva-next')
+        canvas.width = 60
+        canvas.height = 60
+        this.nextGrid = []
+        for(let i = 0; i < 12; i++){
+            this.nextGrid[i] = []
+            for(let j = 0; j< 12; j++){
+                this.nextGrid[i][j] = {
+                    x: i,
+                    y: j,
+                    color: 'red'
+                }
+            }
+        }
+
+        let form = document.body.querySelector('.form')
+        // form.style.backgroundColor='red'
+        form.appendChild(canvas)
+        // console.log(form)
+
+        this.ctx2 = canvas.getContext('2d');
+        this.ctx2.fillStyle = 'red'
+        // this.updateNextRect()
+    }
+
+    updateNextRect(){
+        for(let i = 0; i < 12; i++){
+            for(let j = 0; j< 12; j++){
+                this.ctx2.fillStyle = this.nextGrid[i][j].color
+                this.ctx2.fillRect(i*5,j*5,5,5)
+            }
+        }
     }
 
     createCanvas(host){
