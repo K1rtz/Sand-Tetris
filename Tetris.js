@@ -267,6 +267,7 @@ export class Tetris{
                 obj = row.find(cell => cell.center === true);
             }
         })
+
         if(obj.x<4){
             obj.x=4;
         }
@@ -379,6 +380,7 @@ export class Tetris{
         }else{
 
         }
+        
 
 
         for(let i = 0; i < this.cols; i++){
@@ -395,7 +397,9 @@ export class Tetris{
                 // }
                 else
                 this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
-            
+            if(this.grid[i][j].center)
+                this.ctx.fillStyle = 'purple'
+
             this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
             this.grid2[i][j] = {
                 x: i,
@@ -532,6 +536,11 @@ export class Tetris{
                             })
                         }) 
                     }
+                    //DODATO KASNIJE ZA ONE RUPE U SREDINI
+                    if(this.grid[i][j].center && j<99 &&!this.grid2[i][j+1].block ){
+                        this.grid[i][j].center = false;
+                        this.grid2[i][j+1].center = true;
+                    }
             }
         }
         if(this.rotate){
@@ -575,6 +584,11 @@ export class Tetris{
             for(let i = this.cols-2; i >= 0; i--){ 
                 for(let j = 0; j < this.rows; j++){
                     
+                    if(this.grid2[i][j].center && !this.grid2[i][j].block && !this.grid2[i+1][j].center &&!this.grid2[i+1][j].block){
+                        this.grid2[i][j].center = false
+                        console.log('sampita')
+                        this.grid2[i+1][j].center = true
+                    }
                     if(val && this.grid2[i][j].block == true && this.grid2[i][j].initial == true &&  this.grid2[i+1][j].block == false){
                         this.grid2[i][j].block = false
                         this.grid2[i][j].initial = false
@@ -584,6 +598,7 @@ export class Tetris{
                         this.grid2[i+1][j].color = this.grid2[i][j].color
                         this.grid2[i+1][j].blockColor = this.grid2[i][j].blockColor
                         this.grid2[i+1][j].center = this.grid2[i][j].center
+                        this.grid2[i][j].center = false
                     }
                 }
             }
@@ -739,43 +754,111 @@ export class Tetris{
     }
 
 
+    fillNextFigure(){
+
+        let figurines = Math.floor(Math.random() * 3)
+        figurines  = 0;
+        let colors = ['red', 'blue', 'green']
+        let rnd = Math.floor(Math.random() * colors.length);
+
+        // i>1.  i<2.   j>3.  j<4.
+        let restrictions = [[-1 , 12, -1, 12],
+                            [-1 , 12,  3,  8],
+                            [-1 , 12, 7, 12],
+                            []]
+        let t = 1;
+
+        console.log(restrictions[0][0])
+
+        for(let i = 0; i < 12; i++){
+            for(let j = 0; j< 12; j++){
+                if(i > restrictions[t][0] && i < restrictions[t][1] && j > restrictions[t][2] && j < restrictions[t][3] 
+                || (t==2 && i > 3 && i < 8 && j > 3 && j < 8) 
+                || (t==3 && i > 7 || t==3 && j > 7)//  || t==3 && i > 3 && i < 8 && j > 3 && j < 8)
+                ){
+                    
+                    
+                    this.nextGrid[i][j].block = true;
+                    this.nextGrid[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+                    rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+                    rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+
+                    this.nextGrid[i][j].blockColor = colors[rnd];
+                }else{
+                    this.nextGrid[i][j].block = false;
+                    this.nextGrid[i][j].color = 'black';
+                }
+
+                // let x = this.grid2[i][j].x
+                // let y = this.grid2[i][j].y
+
+                // this.nextGrid[i][j].x = x
+                // this.nextGrid[i][j].y = y
+
+                if(i > 3 && i < 8 && j > 3 && j < 8){
+                    this.nextGrid[i][j].center = true
+                }
+            }
+        }
+    }
+
+
+
     async dodajFiguru(){
         
         let figurines = Math.floor(Math.random() * 3)
         // figurines = 1
         figurines  = 0;
         let colors = ['red', 'blue', 'green']
+
+
+
         if(figurines == 0){
 
-            let rnd = Math.floor(Math.random() * colors.length);
-            // console.log(rnd);
+            // let rnd = Math.floor(Math.random() * colors.length);
+
+            // for(let i = 24; i < 36; i++){
+            //     for(let j = 1; j < 13; j++){
+            //         this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+            //         rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+            //         rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+            //         this.grid2[i][j].blockColor = colors[rnd];
+            //         this.grid2[i][j].block = true;
+            //         this.grid2[i][j].initial = true;
+            //         this.grid2[i][j].visited = false;
+            //         this.grid[i][j].blockColor = colors[rnd];
+            //         this.grid[i][j].block = true;
+            //         this.grid[i][j].initial = true;
+            //         this.grid[i][j].visited = false;
+
+            //         let x =  this.grid2[i][j].color
+            //         this.nextGrid[i-24][j-1].color = x
+
+            //         if(i> 27 && i < 32 && j > 4 && j < 9){
+            //             this.grid[i][j].center = true;
+            //             this.grid2[i][j].center = true;
+            //         }
+
+            //         // this.updateNextRect()
+            //     }
+            // }
+            
+            if(this.nextGrid[0][0].color == 'initial'){
+                console.log('initialje')
+                console.log(this.grid2)
+                this.fillNextFigure()
+            }
+            
             for(let i = 24; i < 36; i++){
-                for(let j = 1; j < 13; j++){
-                    this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
-                    rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                    rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
-                    this.grid2[i][j].blockColor = colors[rnd];
-                    this.grid2[i][j].block = true;
-                    this.grid2[i][j].initial = true;
-                    this.grid2[i][j].visited = false;
-                    this.grid[i][j].blockColor = colors[rnd];
-                    this.grid[i][j].block = true;
-                    this.grid[i][j].initial = true;
-                    this.grid[i][j].visited = false;
-
-                    // this.nextGrid[i-24][j-1].color = this.grid2[i][j].color;
-                    let x =  this.grid2[i][j].color
-                    this.nextGrid[i-24][j-1].color = x
-
-                    if(i> 27 && i < 32 && j > 4 && j < 9){
-                        this.grid[i][j].center = true;
-                        this.grid2[i][j].center = true;
-                    }
-
-                    this.updateNextRect()
+                for(let j = 0; j < 12; j++){
+                    this.grid2[i][j] = {...this.nextGrid[i-24][j]}
                 }
             }
             
+            this.fillNextFigure()
+            this.updateNextRect()
+
+
         }   
         else if(figurines == 1){
 
@@ -873,7 +956,12 @@ export class Tetris{
                 this.nextGrid[i][j] = {
                     x: i,
                     y: j,
-                    color: 'red'
+                    color: 'initial',
+                    blockColor: 'red',
+                    block: true,
+                    initial: true,
+                    visited: false,
+                    center: false
                 }
             }
         }
