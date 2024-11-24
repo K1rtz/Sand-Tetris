@@ -17,7 +17,7 @@ export class Tetris{
 
         this.ctx
 
-        this.frameDelay = 40;
+        this.frameDelay = 1;
 
         this.fell = false;
         this.moveRight = false;
@@ -36,7 +36,14 @@ export class Tetris{
 
         this.ctx2
 
+
+
         this.score = 0.0;
+        this.level = 1;
+        this.blocks = 0;
+
+        this.active = true;
+
         this.coin=false;
 
         this.isMoving=false;
@@ -77,14 +84,46 @@ export class Tetris{
         main.classList.add('main');
         this.host.appendChild(main);
 
+        let headerHolder = document.createElement('div')
+        headerHolder.classList.add('header-holder')
+        main.appendChild(headerHolder)
+
+        let headerText = document.createElement('span')
+        headerText.classList.add('header-text')
+        headerText.innerHTML = "SAND TETRIS"
+        headerHolder.appendChild(headerText)
+
+
+
+        let contentHolder  = document.createElement('div')
+        contentHolder.classList.add('content-holder')
+        main.appendChild(contentHolder)
+
+
+
+
+
+
         let scoreAndDisplay = document.createElement('div')
         scoreAndDisplay.classList.add('score-display')
-        main.appendChild(scoreAndDisplay)
+        contentHolder.appendChild(scoreAndDisplay)
+
+        const popPause = document.createElement('div')
+        popPause.classList.add('popPause')
+        scoreAndDisplay.appendChild(popPause)
+
+        let textPause = document.createElement('span')
+        textPause.classList.add('textPause')
+        textPause.innerHTML = "PAUSE"
+        popPause.appendChild(textPause)
 
 
-        //this.updateScore();
 
-        this.createForm(main)
+        
+        this.createForm(contentHolder)
+        this.updateScore();
+        this.updateBlocks();
+        this.updateLevel();
         this.createCanvasNext()
         this.createCanvas(scoreAndDisplay)
         this.draw()
@@ -97,33 +136,49 @@ export class Tetris{
         formWrapper.classList.add('form-wrapper')
         host.appendChild(formWrapper)
 
+        let label1 = document.createElement('label')
+        formWrapper.appendChild(label1)
+        label1.innerHTML = "NEXT"
         const form = document.createElement('div')
         form.classList.add('form', 'for')
         formWrapper.appendChild(form)
 
         
         let label2 = document.createElement('label')
-        label2.innerHTML = "SCORE:"
+        label2.innerHTML = "SCORE"
         formWrapper.appendChild(label2)
         const form2 = document.createElement('div')
         form2.classList.add('form2', 'for')
         formWrapper.appendChild(form2)
+        let spen2 = document.createElement('span')
+        spen2.classList.add('innerText', 'scoreText')
+        form2.appendChild(spen2)
+
         
         let label3 = document.createElement('label')
-        label3.innerHTML = "LEVEL:"
+        label3.innerHTML = "LEVEL"
         formWrapper.appendChild(label3)
         const form3 = document.createElement('div')
         form3.classList.add('form3', 'for')
         formWrapper.appendChild(form3)
         // form3.innerHTML = "SCORE"
 
+        let spen3 = document.createElement('span')
+        spen3.classList.add('innerText', 'levelText')
+        form3.appendChild(spen3)
+
 
         let label4 = document.createElement('label')
-        label4.innerHTML = "BLOCKS:"
+        label4.innerHTML = "BLOCKS"
         formWrapper.appendChild(label4)
         const form4 = document.createElement('div')
         form4.classList.add('form4', 'for')
         formWrapper.appendChild(form4)
+
+        let spen4 = document.createElement('span')
+        spen4.classList.add('innerText', 'blocksText')
+        form4.appendChild(spen4)
+
 
         const form6 = document.createElement('div')
         form6.classList.add('form6', 'for')
@@ -167,10 +222,24 @@ export class Tetris{
     }
 
     updateScore(){
-        let score = document.body.querySelector('.score');
+        let score = document.body.querySelector('.scoreText');
+        console.log(score)
         score.innerHTML = this.score;
     }
+    updateLevel(){
+        let levels = document.body.querySelector('.levelText');
+        console.log(levels)
+        if(this.score > 3200 * this.level){
+            this.level++
+        }
 
+        levels.innerHTML = this.level;
+    }
+    updateBlocks(){
+        let blocks = document.body.querySelector('.blocksText');
+        console.log(blocks)
+        blocks.innerHTML = this.blocks;
+    }
 
     destroyAnimation(){
 
@@ -198,8 +267,12 @@ export class Tetris{
             console.log('usloseuelse')
             console.log(this.destroyArray.length)
             if(this.destroyArray.length!=0){
-                this.score+= this.destroyArray.length;
+                this.score+= this.destroyArray.length + Math.floor(this.destroyArray.length*0.5);
                 this.updateScore()
+                this.updateLevel()
+                this.blocks+= this.destroyArray.length
+                this.updateBlocks()
+
 
             this.unisti().then(()=>{
                 this.play = true
@@ -358,30 +431,38 @@ export class Tetris{
             }
         }
 
+
         this.rotate = false;
  
     }
 
+    greyOut(){
+
+        
+        for(let i = 0; i < this.cols; i++){
+            for(let j = 0; j < this.rows; j++){
+                if(this.grid[i][j].block == false && j!=16 || this.grid[i][j].initial)
+                    this.ctx.fillStyle = 'black'
+                else
+                    this.ctx.fillStyle = 'grey'
+                if(j == 16 && this.grid[i][j].block == false)
+                    this.ctx.fillStyle = '#246A7350'
+                
+                
+
+            this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
+            }
+        }
+    }
 
     draw(){
-
-        // if(this.rotate){
-        //     this.rotation()
-        // }
-        //console.log("backandforth?")
-        //this.cells.forEach(e=>e.show())
         for(let i = 0; i < 30; i++){
-            if(this.grid[i][16].block && !this.grid[i][16].initial)
+            if(this.grid[i][16].block && !this.grid[i][16].initial){
                 console.log('GAMELOST')
+                this.active = false;
+            }
         }
-        if(Math.random() > 0.5){
-                document.body.classList.add('gradient2')
-
-        }else{
-
-        }
-        
-
+        if(1){//this.active){
 
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
@@ -397,8 +478,7 @@ export class Tetris{
                 // }
                 else
                 this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
-            if(this.grid[i][j].center)
-                this.ctx.fillStyle = 'purple'
+
 
             this.ctx.fillRect(i*this.w,j*this.w,this.w, this.w);
             this.grid2[i][j] = {
@@ -537,10 +617,10 @@ export class Tetris{
                         }) 
                     }
                     //DODATO KASNIJE ZA ONE RUPE U SREDINI
-                    if(this.grid[i][j].center && j<99 &&!this.grid2[i][j+1].block ){
-                        this.grid[i][j].center = false;
-                        this.grid2[i][j+1].center = true;
-                    }
+                    // if(this.grid[i][j].center && j<99 &&!this.grid2[i][j+1].block ){
+                    //     this.grid[i][j].center = false;
+                    //     this.grid2[i][j+1].center = true;
+                    // }
             }
         }
         if(this.rotate){
@@ -566,7 +646,9 @@ export class Tetris{
         
  
 
-        
+    }
+        if(!this.active)
+            this.greyOut()
     }
 
     checkForMoves(){
@@ -584,11 +666,7 @@ export class Tetris{
             for(let i = this.cols-2; i >= 0; i--){ 
                 for(let j = 0; j < this.rows; j++){
                     
-                    if(this.grid2[i][j].center && !this.grid2[i][j].block && !this.grid2[i+1][j].center &&!this.grid2[i+1][j].block){
-                        this.grid2[i][j].center = false
-                        console.log('sampita')
-                        this.grid2[i+1][j].center = true
-                    }
+
                     if(val && this.grid2[i][j].block == true && this.grid2[i][j].initial == true &&  this.grid2[i+1][j].block == false){
                         this.grid2[i][j].block = false
                         this.grid2[i][j].initial = false
@@ -598,7 +676,7 @@ export class Tetris{
                         this.grid2[i+1][j].color = this.grid2[i][j].color
                         this.grid2[i+1][j].blockColor = this.grid2[i][j].blockColor
                         this.grid2[i+1][j].center = this.grid2[i][j].center
-                        this.grid2[i][j].center = false
+                        // this.grid2[i][j].center = false
                     }
                 }
             }
@@ -758,42 +836,50 @@ export class Tetris{
 
         let figurines = Math.floor(Math.random() * 3)
         figurines  = 0;
-        let colors = ['red', 'blue', 'green']
+        let colors = ['red', 'blue', 'green', 'yellow']
         let rnd = Math.floor(Math.random() * colors.length);
 
         // i>1.  i<2.   j>3.  j<4.
-        let restrictions = [[-1 , 12, -1, 12],
-                            [-1 , 12,  3,  8],
-                            [-1 , 12, 7, 12],
+        //0 -> SQUARE
+        //1 -> LINE
+        //2 -> T SHAPE
+        //3 -> Z
+        //4 -> L
+        let restrictions = [[1 , 10, 1, 10],
+                            [-1 , 12,  2,  8],
+                            [],//[-1 , 12, 7, 12],
+                            [],
                             []]
-        let t = 1;
-
+        let t = Math.floor(Math.random() * restrictions.length)
+        // console.log(t)
+        // t = 3
+        // rnd = 3;
         console.log(restrictions[0][0])
 
         for(let i = 0; i < 12; i++){
             for(let j = 0; j< 12; j++){
                 if(i > restrictions[t][0] && i < restrictions[t][1] && j > restrictions[t][2] && j < restrictions[t][3] 
-                || (t==2 && i > 3 && i < 8 && j > 3 && j < 8) 
-                || (t==3 && i > 7 || t==3 && j > 7)//  || t==3 && i > 3 && i < 8 && j > 3 && j < 8)
-                ){
-                    
-                    
+                || (t==2 && j > 3 && j < 8 || t==2 && i > 3 && i < 8 && j < 4) 
+                || (t==3 && (i<8  && j < 4 || i < 4 && j < 4 || i > 3 && j < 8 && j > 3))
+                || (t==4 && (i>3 && i<8 || i > 4 && j > 7))){
+                                        //54 31 97
                     this.nextGrid[i][j].block = true;
                     this.nextGrid[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
                     rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                    rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
-
+                    rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) :
+                    // rnd == '3' ? this.generateRandomShade({r:164, g:20, b: 215}) : 0
+                    // rnd == '3' ? this.generateRandomShade({r:254, g:238, b: 125}) : 0
+                    rnd == '3' ? this.generateRandomShade({r:254, g:160, b: 21}) : 0
+                    this.nextGrid[i][j].block = true;
+                    this.nextGrid[i][j].initial = true;
+                    this.nextGrid[i][j].visited = false;
                     this.nextGrid[i][j].blockColor = colors[rnd];
+
                 }else{
                     this.nextGrid[i][j].block = false;
                     this.nextGrid[i][j].color = 'black';
                 }
 
-                // let x = this.grid2[i][j].x
-                // let y = this.grid2[i][j].y
-
-                // this.nextGrid[i][j].x = x
-                // this.nextGrid[i][j].y = y
 
                 if(i > 3 && i < 8 && j > 3 && j < 8){
                     this.nextGrid[i][j].center = true
@@ -806,14 +892,14 @@ export class Tetris{
 
     async dodajFiguru(){
         
-        let figurines = Math.floor(Math.random() * 3)
+        // let figurines = Math.floor(Math.random() * 3)
         // figurines = 1
-        figurines  = 0;
-        let colors = ['red', 'blue', 'green']
+        // figurines  = 1;
+        // let colors = ['red', 'blue', 'green']
 
 
 
-        if(figurines == 0){
+        // if(figurines == 0){
 
             // let rnd = Math.floor(Math.random() * colors.length);
 
@@ -859,62 +945,62 @@ export class Tetris{
             this.updateNextRect()
 
 
-        }   
-        else if(figurines == 1){
+        // }   
+        // else if(figurines == 1){
 
-            let rnd = Math.floor(Math.random() * colors.length);
-            for(let i = 24; i < 36; i++){
-                for(let j = 1; j < 13; j++){
-                    if(j>8 || (i>27 && i<32 && j>4)){
+        //     let rnd = Math.floor(Math.random() * colors.length);
+        //     for(let i = 24; i < 36; i++){
+        //         for(let j = 1; j < 13; j++){
+        //             if(j>8 || (i>27 && i<32 && j>4)){
 
-                        this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
-                        rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                        rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
-                        this.grid2[i][j].blockColor = colors[rnd];
-                        this.grid2[i][j].block = true;
-                        this.grid2[i][j].initial = true;
-                        this.grid2[i][j].visited = false;
-                        this.grid[i][j].blockColor = colors[rnd];
-                        this.grid[i][j].block = true;
-                        this.grid[i][j].initial = true;
-                        this.grid[i][j].visited = false;
-                    }
-                    if(i> 27 && i < 32 && j > 4 && j < 9){
-                        this.grid[i][j].center = true;
-                        this.grid2[i][j].center = true;
-                    }
+        //                 this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+        //                 rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+        //                 rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+        //                 this.grid2[i][j].blockColor = colors[rnd];
+        //                 this.grid2[i][j].block = true;
+        //                 this.grid2[i][j].initial = true;
+        //                 this.grid2[i][j].visited = false;
+        //                 this.grid[i][j].blockColor = colors[rnd];
+        //                 this.grid[i][j].block = true;
+        //                 this.grid[i][j].initial = true;
+        //                 this.grid[i][j].visited = false;
+        //             }
+        //             if(i> 27 && i < 32 && j > 4 && j < 9){
+        //                 this.grid[i][j].center = true;
+        //                 this.grid2[i][j].center = true;
+        //             }
 
-                }
-            }
+        //         }
+        //     }
             
-        }
-        else if(figurines == 2){
+        // }
+        // else if(figurines == 2){
 
-            let rnd = Math.floor(Math.random() * colors.length);
-            for(let i = 24; i < 36; i++){
-                for(let j = 1; j < 13; j++){
-                    if(j>4 && j < 9){
+        //     let rnd = Math.floor(Math.random() * colors.length);
+        //     for(let i = 24; i < 36; i++){
+        //         for(let j = 1; j < 13; j++){
+        //             if(j>4 && j < 9){
 
-                        this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
-                        rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
-                        rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
-                        this.grid2[i][j].blockColor = colors[rnd];
-                        this.grid2[i][j].block = true;
-                        this.grid2[i][j].initial = true;
-                        this.grid2[i][j].visited = false;
-                        this.grid[i][j].blockColor = colors[rnd];
-                        this.grid[i][j].block = true;
-                        this.grid[i][j].initial = true;
-                        this.grid[i][j].visited = false;
-                    }
-                    if(i> 27 && i < 32 && j > 4 && j < 9){
-                        this.grid[i][j].center = true;
-                        this.grid2[i][j].center = true;
-                    }
-                }
-            }
+        //                 this.grid2[i][j].color = rnd == '0' ? this.generateRandomShade({r:255, g:0, b:0}) :
+        //                 rnd == '1' ? this.generateRandomShade({r:0, g:0, b: 255}) : 
+        //                 rnd == '2' ? this.generateRandomShade({r:0, g:255, b: 0}) : 0
+        //                 this.grid2[i][j].blockColor = colors[rnd];
+        //                 this.grid2[i][j].block = true;
+        //                 this.grid2[i][j].initial = true;
+        //                 this.grid2[i][j].visited = false;
+        //                 this.grid[i][j].blockColor = colors[rnd];
+        //                 this.grid[i][j].block = true;
+        //                 this.grid[i][j].initial = true;
+        //                 this.grid[i][j].visited = false;
+        //             }
+        //             if(i> 27 && i < 32 && j > 4 && j < 9){
+        //                 this.grid[i][j].center = true;
+        //                 this.grid2[i][j].center = true;
+        //             }
+        //         }
+        //     }
             
-        }   
+        // }   
 
 
         this.fell = false;
@@ -923,8 +1009,12 @@ export class Tetris{
 
     generateRandomShade(baseColor) {
         // Nasumično generiši faktor između 0 i 1
-        const factor = Math.random();
+        var factor = Math.random() * 1 ;
     
+        if(factor < .4){
+            factor = .65
+        }
+
         var r = Math.round(baseColor.r * factor);
         var g = Math.round(baseColor.g * factor);
         var b = Math.round(baseColor.b * factor);
@@ -938,7 +1028,212 @@ export class Tetris{
             b = 150;
         }
 
+        // //ORANGE?
+        // if(baseColor.r == 255){
+        //     console.log('red')
+        //     let rnd = Math.floor(Math.random() *3) ;
+        //     console.log(rnd)
+        //     if(rnd == 1){
+        //         console.log('s')
+        //         r = 200;
+        //         g = 50
+        //         b = 50
+        //     }
+        //     else if(rnd == 0){
+        //         console.log('nula')
+        //         r = 220
+        //         g = 80
+        //         b = 80
+        //     }
+        //     else if(rnd == 2){
+        //         r = 170
+        //         g = 40
+        //         b = 40
+        //     }
+        // }
+        if(baseColor.r == 255) {
+            console.log('red');
+            let rnd = Math.floor(Math.random() * 3);
+            console.log(rnd);
+            if(rnd == 1) {
+                console.log('s');
+                r = 160;
+                g = 40;
+                b = 40;
+            } else if(rnd == 0) {
+                console.log('nula');
+                r = 180;
+                g = 65;
+                b = 65;
+            } else if(rnd == 2) {
+                r = 140;
+                g = 30;
+                b = 30;
+            }
+        }
+        // //GREEN
+        // if(baseColor.g == 255){
+        //     console.log('green')
+        //     let rnd = Math.floor(Math.random() *3) ;
+        //     console.log(rnd)
+        //     if(rnd == 1){
+        //         console.log('s')
+        //         r = 85;
+        //         g = 170
+        //         b = 85
+        //     }
+        //     else if(rnd == 0){
+        //         console.log('nula')
+        //         r = 102
+        //         g = 187
+        //         b = 102
+        //     }
+        //     else if(rnd == 2){
+        //         r = 68
+        //         g = 136
+        //         b = 68
+        //     }
+        // }
+        if(baseColor.g == 255) {
+            console.log('green');
+            let rnd = Math.floor(Math.random() * 3);
+            console.log(rnd);
+            if(rnd == 1) {
+                console.log('s');
+                r = 68;
+                g = 136;
+                b = 68;
+            } else if(rnd == 0) {
+                console.log('nula');
+                r = 82;
+                g = 150;
+                b = 82;
+            } else if(rnd == 2) {
+                r = 54;
+                g = 108;
+                b = 54;
+            }
+        }
+        //BLUE
+        if(baseColor.b == 255) {
+            console.log('blue');
+            let rnd = Math.floor(Math.random() * 3);
+            console.log(rnd);
+            if(rnd == 1) {
+                console.log('s');
+                r = 90;
+                g = 130;
+                b = 195;
+            } else if(rnd == 0) {
+                console.log('nula');
+                r = 85;
+                g = 120;
+                b = 185;
+            } else if(rnd == 2) {
+                r = 80;
+                g = 110;
+                b = 170;
+            }
+        }
+        //ZUTA
+
+        // if(baseColor.r == 254){
+        //     console.log('blue')
+        //     let rnd = Math.floor(Math.random() *3) ;
+        //     console.log(rnd)
+        //     if(rnd == 1){
+        //         console.log('s')
+        //         r = 245;
+        //         g = 215
+        //         b = 0
+        //     }
+        //     else if(rnd == 0){
+        //         console.log('nula')
+        //         r = 215;
+        //         g = 235
+        //         b = 153
+        //     }
+        //     else if(rnd == 2){
+        //         r = 225;
+        //         g = 179
+        //         b = 71
+        //     }
+        // }
+        if(baseColor.r == 254) {
+            console.log('yellow');
+            let rnd = Math.floor(Math.random() * 3);
+            console.log(rnd);
+            if(rnd == 1) {
+                console.log('s');
+                r = 240;
+                g = 200;
+                b = 50;
+            } else if(rnd == 0) {
+                console.log('nula');
+                r = 230;
+                g = 180;
+                b = 50;
+            } else if(rnd == 2) {
+                r = 220;
+                g = 170;
+                b = 50;
+            }
+        }
+
+        let clrs = this.rgbToHsl(r, g, b)
+        // clrs[0] = 1
+        clrs[1] = .9;
+        // clrs[2] = .45
+        let slrs = this.hslToRgb(clrs[0], clrs[1], clrs[2])
+        r = slrs[0]
+        g = slrs[1]
+        b = slrs[2]
+
+
         return `rgb(${r}, ${g}, ${b})`;
+    }
+
+     rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        let max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+    
+        if (max === min) {
+            h = s = 0; // Grayscale
+        } else {
+            let d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return [h * 360, s, l];
+    }
+    
+     hslToRgb(h, s, l) {
+        let r, g, b;
+        if (s === 0) {
+            r = g = b = l; // Grayscale
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            let p = 2 * l - q;
+            h /= 360;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     }
 
     swapGrids(){
@@ -979,7 +1274,12 @@ export class Tetris{
     updateNextRect(){
         for(let i = 0; i < 12; i++){
             for(let j = 0; j< 12; j++){
-                this.ctx2.fillStyle = this.nextGrid[i][j].color
+                // if(this.nextGrid[i][j].color == 'black'){
+                    // this.ctx2.fillStyle = 'white'
+                    // console.log('grej')
+                // }else{
+                    this.ctx2.fillStyle = this.nextGrid[i][j].color
+                // }
                 this.ctx2.fillRect(i*5,j*5,5,5)
             }
         }
@@ -1032,7 +1332,7 @@ export class Tetris{
     animate(){
         const currentTime = performance.now()
         if (currentTime - this.lastFrameTime >= this.frameDelay) {
-            if(this.play){
+            if(this.play && this.active){
                 this.ctx.resetTransform()
                 this.ctx.clearRect(0, 0, this.width, this.height)
                 this.draw()
@@ -1045,7 +1345,7 @@ export class Tetris{
                 
                 
             }
-            else{
+            else if(this.active){
                 this.destroyAnimation();
             }
 
