@@ -14,6 +14,8 @@ export class Tetris{
         this.grid2
         this.nextGrid
         this.cells = []
+        this.music = new Audio('./audio/music.mp3')
+        this.music.volume = .5;   
 
         this.ctx
 
@@ -42,12 +44,14 @@ export class Tetris{
         this.level = 1;
         this.blocks = 0;
 
-        this.active = true;
+        this.active = false;
 
         this.coin=false;
 
         this.isMoving=false;
         this.isRotating=false;
+
+        this.pbSpeed = 1;
 
     }
 
@@ -118,8 +122,147 @@ export class Tetris{
         popPause.appendChild(textPause)
 
 
+        const popGameOverScreen = document.createElement('div')
+        popGameOverScreen.classList.add('popGameOverScreen')
+        scoreAndDisplay.appendChild(popGameOverScreen)
 
+        //..sssssssssssssssssssssssssssssss..//
+
+        const divGameOver = document.createElement('div')
+        divGameOver.classList.add('divGameOver')
+        popGameOverScreen.appendChild(divGameOver);
+
+        const textGameOver = document.createElement('span')
+        textGameOver.innerHTML = "GAME OVER"
+        textGameOver.classList.add('textGameOver')
+        divGameOver.appendChild(textGameOver)
+
+        //-----
+
+        const divLine = document.createElement('div')
+        divLine.classList.add('divLine')
+        scoreAndDisplay.appendChild(divLine)
+
+       // -----
+
+        const divNewGame = document.createElement('button')
+        divNewGame.classList.add('divNewGame')
+        popGameOverScreen.appendChild(divNewGame);
+
+        const textNewGame = document.createElement('span')
+        textNewGame.innerHTML = "REPLAY"
+        textNewGame.classList.add('textNewGame')
+        divNewGame.appendChild(textNewGame)
+
+        divNewGame.onclick = (ev) =>{
+            // popStartScreen.style.display='flex'
+            popGameOverScreen.style.display='none'
+            this.resetGame()
+            
+            this.active = true;
+            this.dodajFiguru()
+            this.swapGrids()
+        }
+
+        //..sssssssssssssssssssssssssssssss..//
+
+        const popStartScreen = document.createElement('div')
+        popStartScreen.classList.add('popStartScreen')
+        scoreAndDisplay.appendChild(popStartScreen)
+
+
+        const divWelcome = document.createElement('div')
+        divWelcome.classList.add('divWelcome')
+        popStartScreen.appendChild(divWelcome);
+
+        const textWelcome = document.createElement('span')
+        textWelcome.innerHTML = "WELCOME"
+        textWelcome.classList.add('textWelcome')
+        divWelcome.appendChild(textWelcome)
+
+        // -----
+        const divStart = document.createElement('button')
+        divStart.classList.add('divStart')
+        popStartScreen.appendChild(divStart);
+
+        const textStart = document.createElement('span')
+        textStart.innerHTML = "START"
+        textStart.classList.add('textStart')
+        divStart.appendChild(textStart)
+
+        divStart.onclick = (ev) =>{
+            this.active = true;
+            popStartScreen.style.display='none'
+            divLine.style.display='flex'
+            this.music.play();
+            this.dodajFiguru()
+            this.swapGrids()
+        }
+
+        // -----
+
+        const divAbout = document.createElement('div')
+        divAbout.classList.add('divAbout')
+        popStartScreen.appendChild(divAbout);
+
+        const textAbout = document.createElement('span')
+        textAbout.innerHTML = "ABOUT"
+        textAbout.classList.add('textAbout')
+        divAbout.appendChild(textAbout)
+
+
+
+
+        let soundDiv = document.createElement('div')
+        soundDiv.classList.add('settings-div')
+        main.appendChild(soundDiv)
+
+
+
+        let sound = document.createElement('div')
+        sound.classList.add('settings-volume')
+        soundDiv.appendChild(sound)
+        sound.on = true;
+
+        sound.onclick = (ev) =>{
+            if(sound.on == true){
+                sound.on = false;
+                sound.style.backgroundImage = 'url(./images/volume-off.png)'
+                this.music.volume = 0;
+            }
+            else{
+                sound.on = true;
+                sound.style.backgroundImage = 'url(./images/volume-on.png)'
+                this.music.volume = 0.5;   
+            }
+            // this.pbSpeed+=0.2;
+            // this.music.playbackRate = this.pbSpeed;
+        }
         
+        let pause = document.createElement('div')
+        pause.classList.add('settings-pause')
+        soundDiv.appendChild(pause)
+        pause.on = '1'
+
+        pause.onclick = (ev) =>{
+            if(pause.on == '1'){
+                this.music.play()
+                pause.on = '2';
+                pause.style.backgroundImage = 'url(./images/play.png)'
+                textPause.style.display = 'flex'
+                this.active = false;
+            }
+            else{
+                divLine.style.display = 'none'
+                pause.on = '1';
+                pause.style.backgroundImage = 'url(./images/pause.png)'
+                textPause.style.display = 'none'
+                this.active = true;
+            }
+
+        }
+
+
         this.createForm(contentHolder)
         this.updateScore();
         this.updateBlocks();
@@ -132,6 +275,7 @@ export class Tetris{
     }  
 
     createForm(host){
+
         let formWrapper = document.createElement('div')
         formWrapper.classList.add('form-wrapper')
         host.appendChild(formWrapper)
@@ -142,6 +286,8 @@ export class Tetris{
         const form = document.createElement('div')
         form.classList.add('form', 'for')
         formWrapper.appendChild(form)
+
+
 
         
         let label2 = document.createElement('label')
@@ -328,8 +474,6 @@ export class Tetris{
         this.grid2[x.x][x.y].block = false;
             })
     }
-
-
     rotation(){
         // if(!this.isRotating){
         //     this.isRotating=true;
@@ -443,10 +587,10 @@ export class Tetris{
             for(let j = 0; j < this.rows; j++){
                 if(this.grid[i][j].block == false && j!=16 || this.grid[i][j].initial)
                     this.ctx.fillStyle = 'black'
-                else
-                    this.ctx.fillStyle = 'grey'
-                if(j == 16 && this.grid[i][j].block == false)
-                    this.ctx.fillStyle = '#246A7350'
+                // else
+                    // this.ctx.fillStyle = 'grey'
+                // if(j == 16 && this.grid[i][j].block == false)
+                    // this.ctx.fillStyle = '#246A7350'
                 
                 
 
@@ -456,25 +600,41 @@ export class Tetris{
     }
 
     draw(){
+        console.log("USLI SMO U DRAW")
         for(let i = 0; i < 30; i++){
             if(this.grid[i][16].block && !this.grid[i][16].initial){
                 console.log('GAMELOST')
+
+                let sS = document.querySelector('.popStartScreen')
+                let eS = document.querySelector('.popGameOverScreen')
+
+                
+                sS.style.display = 'none'
+                eS.style.display = 'flex'
+
+                //ONLOSE
+                this.music.pause()
+
                 this.active = false;
+                //RESET LINE
+                let divLine = document.querySelector('.divLine')
+                console.log(divLine)
+                divLine.style.display = 'none'
+
+                //RESET NEXT-GRID
+                this.ctx2.fillStyle = 'black'
+                this.ctx2.fillRect(0, 0, 120, 120)
+
+                break;
             }
         }
         if(1){//this.active){
-
         for(let i = 0; i < this.cols; i++){
             for(let j = 0; j < this.rows; j++){
-                if(this.grid[i][j].block == false && j!=16)
+                if(this.grid[i][j].block == false) //&& j!=16)
                     this.ctx.fillStyle = 'black'
-                else if(j == 16 && this.grid[i][j].block == false){
-                    this.ctx.fillStyle = '#246A7350'
-                }
-                //else if (this.grid[i][j].initial == true)
-                //this.ctx.fillStyle = 'green'
-                // else if(this.grid[i][j].center == true){
-                    // this.ctx.fillStyle = 'orange'
+                // else if(j == 16 && this.grid[i][j].block == false){
+                    // this.ctx.fillStyle = '#246A7350'
                 // }
                 else
                 this.ctx.fillStyle = this.grid[i][j].color//this.grid[i][j].blockColor//color
@@ -493,7 +653,7 @@ export class Tetris{
             }
         }
         }
-
+    
         //updejtovanje druge
         for(let j = this.rows-1; j >= 0; j--){
             for(let i = this.cols-1; i >= 0; i--){  
@@ -623,32 +783,37 @@ export class Tetris{
                     // }
             }
         }
-        if(this.rotate){
-            this.rotation()
-        }
-        if(this.moveRight || this.moveLeft){
-            this.checkForMoves()
-        }
 
-        if(this.fell == true){
-            this.dodajFiguru().then(()=>{
-                this.fell = false
-                //this.checkForMoves()
-                this.swapGrids()
-                this.checkHits()
-            })
+
+
+            if(this.rotate){
+                this.rotation()
+            }
+            if(this.moveRight || this.moveLeft){
+                this.checkForMoves()
+            }
+            
+            
+            if(this.fell == true){
+                this.dodajFiguru().then(()=>{
+                    this.fell = false
+                    //this.checkForMoves()
+                    this.swapGrids()
+                    this.checkHits()
+                })
         }else{
             //this.checkForMoves()
             this.swapGrids()
             this.checkHits()
-
         }
+            
+    
         
- 
-
+        
     }
-        if(!this.active)
-            this.greyOut()
+        //nesto se desavaig
+        //    if(!this.active)
+            //    this.greyOut()
     }
 
     checkForMoves(){
@@ -1052,16 +1217,12 @@ export class Tetris{
         //     }
         // }
         if(baseColor.r == 255) {
-            console.log('red');
             let rnd = Math.floor(Math.random() * 3);
-            console.log(rnd);
             if(rnd == 1) {
-                console.log('s');
                 r = 160;
                 g = 40;
                 b = 40;
             } else if(rnd == 0) {
-                console.log('nula');
                 r = 180;
                 g = 65;
                 b = 65;
@@ -1095,16 +1256,12 @@ export class Tetris{
         //     }
         // }
         if(baseColor.g == 255) {
-            console.log('green');
             let rnd = Math.floor(Math.random() * 3);
-            console.log(rnd);
             if(rnd == 1) {
-                console.log('s');
                 r = 68;
                 g = 136;
                 b = 68;
             } else if(rnd == 0) {
-                console.log('nula');
                 r = 82;
                 g = 150;
                 b = 82;
@@ -1116,16 +1273,12 @@ export class Tetris{
         }
         //BLUE
         if(baseColor.b == 255) {
-            console.log('blue');
             let rnd = Math.floor(Math.random() * 3);
-            console.log(rnd);
             if(rnd == 1) {
-                console.log('s');
                 r = 90;
                 g = 130;
                 b = 195;
             } else if(rnd == 0) {
-                console.log('nula');
                 r = 85;
                 g = 120;
                 b = 185;
@@ -1160,16 +1313,12 @@ export class Tetris{
         //     }
         // }
         if(baseColor.r == 254) {
-            console.log('yellow');
             let rnd = Math.floor(Math.random() * 3);
-            console.log(rnd);
             if(rnd == 1) {
-                console.log('s');
                 r = 240;
                 g = 200;
                 b = 50;
             } else if(rnd == 0) {
-                console.log('nula');
                 r = 230;
                 g = 180;
                 b = 50;
@@ -1285,6 +1434,76 @@ export class Tetris{
         }
     }
 
+    resetGame(){
+
+        this.fell = false;
+        this.moveRight = false;
+        this.moveLeft = false;
+        this.play = true;
+        this.chargeCount = 0;
+        this.pronadjen = false
+        this.rotate = false
+        this.score = 0.0;
+        this.level = 1;
+        this.blocks = 0;
+        this.active = false;
+        this.isMoving=false;
+        this.isRotating=false;
+
+
+        this.updateLevel()
+        this.updateBlocks()
+        this.updateScore()
+
+
+        //RESET NEXT-GRID
+        for(let i = 0; i < 12; i++){
+            for(let j = 0; j < 12; j++){
+                this.nextGrid[i][j] = {
+                    x: i,
+                    y: j,
+                    color: 'initial',
+                    blockColor: 'red',
+                    block: true,
+                    initial: true,
+                    visited: false,
+                    center: false
+                }
+            }
+        }
+
+        this.nextGrid[0][0].color == 'initial'
+
+
+
+        //RESETING BOTH GRIDS
+        for(let i = 0; i< this.cols; i++){
+            for(let j = 0; j <this.rows; j++){
+                this.grid[i][j] = {
+                    x: i,
+                    y: j,
+                    color: 'background',
+                    blockColor: 'background',
+                    block: false,
+                    initial: false,
+                    visisted: false
+                    
+                }
+                this.grid2[i][j] = {
+                    x: i,
+                    y: j,
+                    color: 'background',
+                    blockColor: 'background',
+                    block: false,
+                    initial: false,
+                    visisted: false
+                };
+            }
+        }
+
+
+    }
+
     createCanvas(host){
         const canvas = document.createElement('canvas');
         canvas.classList.add('canva')
@@ -1322,8 +1541,8 @@ export class Tetris{
         }
 
 
-        this.dodajFiguru()
-        this.swapGrids()
+        // this.dodajFiguru()
+        // this.swapGrids()
 
         host.appendChild(canvas);
         this.ctx = canvas.getContext('2d');
@@ -1333,6 +1552,7 @@ export class Tetris{
         const currentTime = performance.now()
         if (currentTime - this.lastFrameTime >= this.frameDelay) {
             if(this.play && this.active){
+                console.log("USLI SMO PRE DRAW U ANIMATE")
                 this.ctx.resetTransform()
                 this.ctx.clearRect(0, 0, this.width, this.height)
                 this.draw()
