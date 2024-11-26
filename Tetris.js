@@ -15,93 +15,79 @@ export class Tetris{
         this.nextGrid
         this.cells = []
         this.music = new Audio('./audio/music.mp3')
-        this.music.volume = .5;   
+        this.music.volume = .2;   
+        this.music.loop = true;
+        
 
         this.ctx
-
-        this.frameDelay = 1;
-
+        this.frameDelay = 30;
         this.fell = false;
         this.moveRight = false;
         this.moveLeft = false;
-
         this.play = true;
         this.chargeCount = 0;
-
         this.destroyArray = []
         this.registerKeyListeners()
-
-
         this.pronadjen = false
         this.rotate = false
-
-
         this.ctx2
-
-
 
         this.score = 0.0;
         this.level = 1;
         this.blocks = 0;
-
         this.active = false;
-
-        this.coin=false;
 
         this.isMoving=false;
         this.isRotating=false;
-
-        this.pbSpeed = 1;
-
     }
 
+    //Listening for keys for moving block left/right or rotating block
     registerKeyListeners(){
         window.addEventListener('keydown', (event)=>{
-            if(event.key === 'ArrowLeft'){
+            if(event.key === 'ArrowLeft' || event.key === 'a'){
                 this.moveLeft = true;
-            } else if(event.key === 'ArrowRight'){
+            } else if(event.key === 'ArrowRight' || event.key === 'd'){
                 this.moveRight = true;
             }
         })
     
         window.addEventListener('keyup', (event) => {
-            if (event.key === 'ArrowLeft') {
+            if (event.key === 'ArrowLeft'|| event.key === 'a') {
                 this.moveLeft = false;
                 // this.stopMoving();
-            } else if (event.key === 'ArrowRight') {
+            } else if (event.key === 'ArrowRight' || event.key === 'd') {
                 this.moveRight = false;
                 // this.stopMoving();
             }
         }); 
 
         window.addEventListener('keydown', (event)=>{
-            if(event.key === 'ArrowUp' && !event.repeat){
+            if((event.key === 'ArrowUp' || event.key === 'w') && !event.repeat){
                 this.rotate = true;
                 // this.rotation()
             }
         })
     }
 
+    //
     start(){
 
-        let main = document.createElement('div');
-        main.classList.add('main');
-        this.host.appendChild(main);
+        const gameContainer = document.createElement('div');
+        gameContainer.classList.add('game-container');
+        this.host.appendChild(gameContainer);
 
         let headerHolder = document.createElement('div')
         headerHolder.classList.add('header-holder')
-        main.appendChild(headerHolder)
+        gameContainer.appendChild(headerHolder)
 
         let headerText = document.createElement('span')
         headerText.classList.add('header-text')
         headerText.innerHTML = "SAND TETRIS"
         headerHolder.appendChild(headerText)
 
-
-
         let contentHolder  = document.createElement('div')
         contentHolder.classList.add('content-holder')
-        main.appendChild(contentHolder)
+        gameContainer.appendChild(contentHolder)
 
 
 
@@ -215,7 +201,7 @@ export class Tetris{
 
         let soundDiv = document.createElement('div')
         soundDiv.classList.add('settings-div')
-        main.appendChild(soundDiv)
+        gameContainer.appendChild(soundDiv)
 
 
 
@@ -225,18 +211,20 @@ export class Tetris{
         sound.on = true;
 
         sound.onclick = (ev) =>{
-            if(sound.on == true){
-                sound.on = false;
-                sound.style.backgroundImage = 'url(./images/volume-off.png)'
-                this.music.volume = 0;
+            if(this.active){
+
+                if(sound.on == true){
+                    sound.on = false;
+                    sound.style.backgroundImage = 'url(./images/volume-off.png)'
+                    this.music.volume = 0;
+                }
+                else{
+                    sound.on = true;
+                    sound.style.backgroundImage = 'url(./images/volume-on.png)'
+                    this.music.volume = 0.2;   
+                }
             }
-            else{
-                sound.on = true;
-                sound.style.backgroundImage = 'url(./images/volume-on.png)'
-                this.music.volume = 0.5;   
-            }
-            // this.pbSpeed+=0.2;
-            // this.music.playbackRate = this.pbSpeed;
+
         }
         
         let pause = document.createElement('div')
@@ -245,15 +233,18 @@ export class Tetris{
         pause.on = '1'
 
         pause.onclick = (ev) =>{
-            if(pause.on == '1'){
-                this.music.play()
-                pause.on = '2';
-                pause.style.backgroundImage = 'url(./images/play.png)'
-                textPause.style.display = 'flex'
-                this.active = false;
+            if(this.active){
+                if(pause.on == '1'){
+                    this.music.pause()
+                    pause.on = '2';
+                    pause.style.backgroundImage = 'url(./images/play.png)'
+                    textPause.style.display = 'flex'
+                    // divLine.style.display = 'none'
+                    this.active = false;
+                }
             }
-            else{
-                divLine.style.display = 'none'
+            else if(pause.on == 2){
+                this.music.play()
                 pause.on = '1';
                 pause.style.backgroundImage = 'url(./images/pause.png)'
                 textPause.style.display = 'none'
@@ -376,6 +367,9 @@ export class Tetris{
         let levels = document.body.querySelector('.levelText');
         console.log(levels)
         if(this.score > 3200 * this.level){
+            if(this.frameDelay>5){
+                this.frameDelay-=5;
+            }
             this.level++
         }
 
